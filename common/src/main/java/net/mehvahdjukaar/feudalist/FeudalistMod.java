@@ -1,6 +1,7 @@
 package net.mehvahdjukaar.feudalist;
 
 
+import net.mehvahdjukaar.feudalist.common.blocks.PortcullisBlock;
 import net.mehvahdjukaar.feudalist.common.items.TabardChestplateItem;
 import net.mehvahdjukaar.feudalist.common.items.TabardHorseArmorItem;
 import net.mehvahdjukaar.feudalist.common.items.crafting.TabardFromBannerRecipe;
@@ -38,6 +39,8 @@ public class FeudalistMod {
     public static final String MOD_ID = "feudalist";
     public static final Logger LOGGER = LogManager.getLogger("Feudalist");
 
+    public static final boolean SUPP = PlatHelper.isModLoaded("supplementaries");
+
     public static ResourceLocation res(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
@@ -59,6 +62,12 @@ public class FeudalistMod {
                             .sound(SoundType.NETHER_BRICKS)
 
             );
+
+    public static final Supplier<Block> PORTCULLIS = regBlock("portcullis",
+            () -> new PortcullisBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)
+                    .noOcclusion()
+            )
+    );
 
     // end blocks
 

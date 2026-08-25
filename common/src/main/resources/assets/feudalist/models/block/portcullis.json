@@ -1,0 +1,21 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "grate": "minecraft:block/oak_planks",
+    "particle": "minecraft:block/oak_planks"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 6],
+      "to": [16, 18, 10],
+      "faces": {
+        "north": {"texture": "#grate"},
+        "south": {"texture": "#grate"},
+        "east": {"texture": "#grate"},
+        "west": {"texture": "#grate"},
+        "up": {"texture": "#grate"},
+        "down": {"texture": "#grate"}
+      }
+    }
+  ]
+}
