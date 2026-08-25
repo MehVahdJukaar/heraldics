@@ -2,7 +2,9 @@ package net.mehvahdjukaar.feudalist;
 
 import net.mehvahdjukaar.candlelight.api.PlatformImpl;
 import net.mehvahdjukaar.feudalist.client.TabardArmorModel;
+import net.mehvahdjukaar.feudalist.dynamicpack.ModClientDynamicResources;
 import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
+import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.resources.ResourceLocation;
@@ -16,6 +18,7 @@ public class FeudalistModClient {
     private static TabardArmorModel tabardArmorModel;
 
     public static void init() {
+        RegHelper.registerDynamicResourceProvider(new ModClientDynamicResources());
         ClientHelper.addModelLayerRegistration(e -> e.register(TABARD_ARMOR_LAYER, TabardArmorModel::createLayer));
         //the baked parts die with the model set, so throw ours away on reload and bake it again on demand
         ClientHelper.addClientReloadListener(
