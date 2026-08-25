@@ -26,12 +26,16 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
 
     private static final int DEFORMATION = 1;
     private static final CubeDeformation CHESTPLATE_DEFORMATION = new CubeDeformation(DEFORMATION);
-    //as wide as the deformed torso so the two read as one piece of cloth
-    private static final int FLAP_WIDTH = 8 + 2 * DEFORMATION;
-    //three shorter than a vanilla torso, so the cloth stops at the waist and the skirt takes over
-    private static final int BODY_HEIGHT = 9;
-    //picked so torso plus skirt comes out 10 by 20, the same 1:2 a banner flag has
-    private static final int FLAP_HEIGHT = 9;
+    //four shorter than a vanilla torso, so the cloth stops at the waist and the skirt takes over.
+    //at 8 the deformation stretches the torso's texels by the same 1.25 sideways and down, so they come
+    //out square, and torso plus skirt lands on the 1:2 a banner flag has
+    private static final int BODY_HEIGHT = 8;
+    //texels, not model pixels. the skirt is drawn on the same grid as the torso
+    private static final int FLAP_WIDTH = 8;
+    private static final int FLAP_HEIGHT = 8;
+    //the torso grows a pixel on every side from the chestplate deformation, which leaves its uvs alone.
+    //the skirt has to grow by the same amount or its texels would come out smaller than the torso's
+    private static final float FLAP_SCALE = (8f + 2 * DEFORMATION) / FLAP_WIDTH;
     //bottom edge of the deformed body box, and how far its faces sit from the center
     private static final int BODY_BOTTOM = BODY_HEIGHT + DEFORMATION;
     private static final int BODY_FACE_Z = 2 + DEFORMATION;
@@ -52,15 +56,23 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
 
     //how tall those two panels are on the model, which is not how tall they are on the texture
     public static final int BODY_FACE_SIZE = BODY_HEIGHT + 2 * DEFORMATION;
-    public static final int FLAP_FACE_SIZE = FLAP_HEIGHT;
+    public static final int FLAP_FACE_SIZE = Math.round(FLAP_HEIGHT * FLAP_SCALE);
 
     private final ModelPart frontFlap;
     private final ModelPart backFlap;
 
     public TabardArmorModel(ModelPart root) {
         super(root);
-        this.frontFlap = this.body.getChild("front_flap");
-        this.backFlap = this.body.getChild("back_flap");
+        this.frontFlap = stretchedFlap(this.body.getChild("front_flap"));
+        this.backFlap = stretchedFlap(this.body.getChild("back_flap"));
+    }
+
+    //a deformation would do this too, but it grows upwards as well and the top edge would end up inside
+    //the torso, fighting it. scaling the part only ever pushes the cloth down from its hinge
+    private static ModelPart stretchedFlap(ModelPart flap) {
+        flap.xScale = FLAP_SCALE;
+        flap.yScale = FLAP_SCALE;
+        return flap;
     }
 
     public static LayerDefinition createLayer() {
