@@ -10,7 +10,6 @@ import net.mehvahdjukaar.moonlight.api.resources.pack.ResourceGenTask;
 import net.mehvahdjukaar.moonlight.api.resources.pack.ResourceSink;
 import net.mehvahdjukaar.moonlight.api.resources.textures.TextureCollager;
 import net.mehvahdjukaar.moonlight.api.resources.textures.TextureImage;
-import net.mehvahdjukaar.moonlight.api.resources.textures.TextureOps;
 import net.mehvahdjukaar.moonlight.api.util.math.Rect2D;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -18,14 +17,12 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import java.util.function.Consumer;
 
 /**
- * Turns every banner pattern texture into an armor layer for the tabard chestplate.
- * The shape comes from the pattern's alpha, shrunk onto the tabard panels and then used to fade out
- * everything the pattern does not cover on the tabard template.
+ * Turns every banner pattern texture into an armor layer for the tabard chestplate: the flag shrunk
+ * onto the torso panels and flaps, ready to be tinted with the layer color like a banner is.
  */
 public class ModClientDynamicResources extends DynamicClientResourceProvider {
 
     private static final String BANNER_FOLDER = "entity/banner";
-    private static final ResourceLocation TABARD_TEMPLATE = FeudalistMod.res("models/armor/tabard_layer_1");
 
     private static final int BANNER_TEXTURE_SIZE = 64;
     //front face of the banner flag, a 20x40x1 box at the texture origin. the back of it is this mirrored
@@ -58,22 +55,20 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
 
         //the flag shrinks a lot here, box sampling is the only one that keeps the pattern readable.
         //the back panel's u runs the other way round the body, so mirroring the flag there makes both sides
-        //show the same design, like a banner does. both faces of a flap share a strip: read from the other
-        //side it comes out mirrored, which is what a piece of cloth does anyway
+        //show the same design, like a banner does
         return TextureCollager.builder(BANNER_TEXTURE_SIZE, BANNER_TEXTURE_SIZE,
                         TabardArmorModel.TEXTURE_SIZE, TabardArmorModel.TEXTURE_SIZE)
                 .copyFrom(onChest).to(TabardArmorModel.BODY_FRONT_UV).boxScaling()
-                .copyFrom(onFlap).to(TabardArmorModel.FRONT_FLAP_OUTER_UV).boxScaling()
-                .copyFrom(onFlap).to(TabardArmorModel.FRONT_FLAP_INNER_UV).boxScaling()
+                .copyFrom(onFlap).to(TabardArmorModel.FRONT_FLAP_UV).boxScaling()
                 .copyFrom(onChest).to(TabardArmorModel.BODY_BACK_UV).boxScaling().flippedX()
-                .copyFrom(onFlap).to(TabardArmorModel.BACK_FLAP_OUTER_UV).boxScaling().flippedX()
-                .copyFrom(onFlap).to(TabardArmorModel.BACK_FLAP_INNER_UV).boxScaling().flippedX()
+                .copyFrom(onFlap).to(TabardArmorModel.BACK_FLAP_UV).boxScaling().flippedX()
                 .build();
     }
 
     /**
      * A pattern that runs off the edge of a panel has to keep going, or the cloth looks like someone cut it
-     * out with scissors. Every face around the panels takes the edge it touches and stretches it out.
+     * out with scissors. Every torso face around the panels takes the edge it touches and stretches it out.
+     * The arms stay bare so the armor texture shows there.
      */
     private static TextureCollager spreadPanelsOverTheRest() {
         Rect2D front = TabardArmorModel.BODY_FRONT_UV;
@@ -90,32 +85,12 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
         //a side face bridges the two panels, so hand half of it to each
         splitInTwo(builder, TabardArmorModel.BODY_LEFT_SIDE_UV, frontLeft, backLeft);
         splitInTwo(builder, TabardArmorModel.BODY_RIGHT_SIDE_UV, backRight, frontRight);
-        wrapArm(builder, TabardArmorModel.RIGHT_ARM_UV, frontRight, backRight);
-        wrapArm(builder, TabardArmorModel.LEFT_ARM_UV, frontLeft, backLeft);
 
         //top and underside of the torso are laid out along the front panel's u. the back panel is the front
         //mirrored and its u runs the other way, so both ends of these faces want the same row anyway
         builder.copyFrom(front.row(0)).to(TabardArmorModel.BODY_TOP_UV);
         builder.copyFrom(front.row(front.height() - 1)).to(TabardArmorModel.BODY_UNDERSIDE_UV);
         return builder.build();
-    }
-
-    //an arm strip reads [side][front][side][back] and wraps round, so the front half of it starts halfway
-    //into the first side face and the back half runs off the end and comes back at the start
-    private static void wrapArm(TextureCollager.Builder builder, Rect2D arm, Rect2D fromFront, Rect2D fromBack) {
-        int side = TabardArmorModel.ARM_SIZE;
-        int half = side / 2;
-        int top = arm.y() + side;
-
-        builder.copyFrom(fromFront).to(arm.x() + half, top, 2 * side, fromFront.height());
-        builder.copyFrom(fromBack).to(arm.x() + half + 2 * side, top, side + half, fromBack.height());
-        builder.copyFrom(fromBack).to(arm.x(), top, half, fromBack.height());
-
-        //cap on top of the shoulder. its rows run back to front, so it splits along y instead of x
-        Rect2D cap = new Rect2D(arm.x() + side, arm.y(), side, side);
-        int capHalf = cap.height() / 2;
-        builder.copyFrom(fromBack.row(0)).to(cap.x(), cap.y(), cap.width(), capHalf);
-        builder.copyFrom(fromFront.row(0)).to(cap.x(), cap.y() + capHalf, cap.width(), capHalf);
     }
 
     private static void splitInTwo(TextureCollager.Builder builder, Rect2D face, Rect2D firstHalf, Rect2D secondHalf) {
@@ -135,27 +110,24 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
     }
 
     private void addTabardPatterns(ResourceManager manager, ResourceSink sink) {
-        try (TextureImage template = TextureImage.open(manager, TABARD_TEMPLATE)) {
+        try {
             for (ResourceLocation pattern : ResType.TEXTURES.listRelative(manager, BANNER_FOLDER, false)) {
                 //a hand drawn layer sitting at that path wins over anything we could come up with here
                 sink.addTextureUnlessPresent(manager, patternLayer(bannerAssetOf(pattern)),
-                        () -> createPatternLayer(manager, pattern, template));
+                        () -> createPatternLayer(manager, pattern));
             }
         } catch (Exception e) {
             FeudalistMod.LOGGER.error("Failed to generate tabard armor layers: ", e);
         }
     }
 
-    private static TextureImage createPatternLayer(ResourceManager manager, ResourceLocation pattern,
-                                                   TextureImage template) throws Exception {
-        try (TextureImage flag = TextureImage.open(manager, pattern);
-             TextureImage coverage = TextureImage.createNew(template.imageWidth(), template.imageHeight())) {
-            FLAG_ONTO_PANELS.apply(flag, coverage);
-            PANELS_ONTO_REST.apply(coverage, coverage);
-
-            //the template holds the colors, the pattern only says how much of each pixel it takes up
-            TextureImage layer = template.makeCopy();
-            TextureOps.multiplyAlpha(layer, coverage);
+    private static TextureImage createPatternLayer(ResourceManager manager, ResourceLocation pattern) throws Exception {
+        try (TextureImage flag = TextureImage.open(manager, pattern)) {
+            //keep whatever resolution the pattern pack uses
+            int size = flag.imageWidth() * TabardArmorModel.TEXTURE_SIZE / BANNER_TEXTURE_SIZE;
+            TextureImage layer = TextureImage.createNew(size, size);
+            FLAG_ONTO_PANELS.apply(flag, layer);
+            PANELS_ONTO_REST.apply(layer, layer);
             return layer;
         }
     }

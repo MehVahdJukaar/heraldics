@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.mehvahdjukaar.feudalist.dynamicpack.ModClientDynamicResources;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.Material;
@@ -32,7 +31,9 @@ public class TabardArmorRenderer {
 
     public static void renderPatterns(PoseStack poseStack, MultiBufferSource buffer, int packedLight,
                                       ItemStack stack, Model model) {
-        DyeColor baseColor = stack.getOrDefault(DataComponents.BASE_COLOR, DyeColor.WHITE);
+        //a tabard that never was a banner just shows the armor texture
+        DyeColor baseColor = stack.get(DataComponents.BASE_COLOR);
+        if (baseColor == null) return;
         renderLayer(poseStack, buffer, packedLight, model, BASE_PATTERN, baseColor);
 
         BannerPatternLayers patterns = stack.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY);
@@ -43,9 +44,9 @@ public class TabardArmorRenderer {
 
     private static void renderLayer(PoseStack poseStack, MultiBufferSource buffer, int packedLight, Model model,
                                     ResourceLocation bannerAsset, DyeColor color) {
-        //what banners use. it blends instead of cutting out, and it doesn't write depth, so every layer can
-        //sit on the exact same faces without fighting the one under it
-        VertexConsumer vc = materialOf(bannerAsset).buffer(buffer, RenderType::entityNoOutline);
+        //what banners use, plus the armor view offset. it blends instead of cutting out, and it doesn't write
+        //depth, so every layer can sit on the exact same faces without fighting the one under it
+        VertexConsumer vc = materialOf(bannerAsset).buffer(buffer, ModRenderTypes::armorPatternLayer);
         model.renderToBuffer(poseStack, vc, packedLight, OverlayTexture.NO_OVERLAY, color.getTextureDiffuseColor());
     }
 

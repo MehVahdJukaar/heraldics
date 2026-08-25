@@ -2,6 +2,7 @@ package net.mehvahdjukaar.feudalist.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.mehvahdjukaar.moonlight.api.util.math.Rect2D;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -10,8 +11,10 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.mehvahdjukaar.moonlight.api.util.math.Rect2D;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
+
+import java.util.Set;
 
 /**
  * Chestplate model for the tabard. Same shape as a normal chestplate plus two flat panels hanging
@@ -23,33 +26,29 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
 
     private static final int DEFORMATION = 1;
     private static final CubeDeformation CHESTPLATE_DEFORMATION = new CubeDeformation(DEFORMATION);
-    private static final int FLAP_WIDTH = 10;
-    private static final int FLAP_HEIGHT = 4;
-    //two shorter than a vanilla torso, so the cloth stops at the waist and the skirt takes over from there
-    private static final int BODY_HEIGHT = 10;
+    //as wide as the deformed torso so the two read as one piece of cloth
+    private static final int FLAP_WIDTH = 8 + 2 * DEFORMATION;
+    //three shorter than a vanilla torso, so the cloth stops at the waist and the skirt takes over
+    private static final int BODY_HEIGHT = 9;
+    //picked so torso plus skirt comes out 10 by 20, the same 1:2 a banner flag has
+    private static final int FLAP_HEIGHT = 9;
     //bottom edge of the deformed body box, and how far its faces sit from the center
     private static final int BODY_BOTTOM = BODY_HEIGHT + DEFORMATION;
     private static final int BODY_FACE_Z = 2 + DEFORMATION;
 
-    //the two panels the banner is squeezed onto. a zero depth box lays its two faces side by side, outer one first
+    //the panels the banner is squeezed onto
     public static final Rect2D BODY_FRONT_UV = new Rect2D(20, 20, 8, BODY_HEIGHT);
     public static final Rect2D BODY_BACK_UV = new Rect2D(32, 20, 8, BODY_HEIGHT);
-    public static final Rect2D FRONT_FLAP_OUTER_UV = new Rect2D(0, 32, FLAP_WIDTH, FLAP_HEIGHT);
-    public static final Rect2D FRONT_FLAP_INNER_UV = new Rect2D(FLAP_WIDTH, 32, FLAP_WIDTH, FLAP_HEIGHT);
-    public static final Rect2D BACK_FLAP_INNER_UV = new Rect2D(0, 40, FLAP_WIDTH, FLAP_HEIGHT);
-    public static final Rect2D BACK_FLAP_OUTER_UV = new Rect2D(FLAP_WIDTH, 40, FLAP_WIDTH, FLAP_HEIGHT);
+    public static final Rect2D FRONT_FLAP_UV = new Rect2D(0, 32, FLAP_WIDTH, FLAP_HEIGHT);
+    public static final Rect2D BACK_FLAP_UV = new Rect2D(3 * FLAP_WIDTH, 32, FLAP_WIDTH, FLAP_HEIGHT);
 
-    //everything else the pattern spills onto. the torso unfolds as one strip that wraps all the way
+    //the rest of the torso the pattern spills onto. it unfolds as one strip that wraps all the way
     //around: right side runs back to front, then the front panel, then the left side front to back, then the back panel
     public static final Rect2D BODY_RIGHT_SIDE_UV = new Rect2D(16, 20, 4, BODY_HEIGHT);
     public static final Rect2D BODY_LEFT_SIDE_UV = new Rect2D(28, 20, 4, BODY_HEIGHT);
     //shoulder tops and the underside, both laid out along the front panel's u
     public static final Rect2D BODY_TOP_UV = new Rect2D(20, 16, 8, 4);
     public static final Rect2D BODY_UNDERSIDE_UV = new Rect2D(28, 16, 8, 4);
-    //an arm block is the same kind of strip, [side][front][side][back], plus a cap above it
-    public static final Rect2D RIGHT_ARM_UV = new Rect2D(40, 16, 16, 16);
-    public static final Rect2D LEFT_ARM_UV = new Rect2D(0, 48, 16, 16);
-    public static final int ARM_SIZE = 4;
 
     //how tall those two panels are on the model, which is not how tall they are on the texture
     public static final int BODY_FACE_SIZE = BODY_HEIGHT + 2 * DEFORMATION;
@@ -66,30 +65,25 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
 
     public static LayerDefinition createLayer() {
         MeshDefinition mesh = HumanoidModel.createMesh(CHESTPLATE_DEFORMATION, 0);
-        PartDefinition root = mesh.getRoot();
-
-        //vanilla mirrors the left arm onto the right arm's texture, which would force the pattern to be
-        //symmetric. give it its own corner of the texture instead
-        root.addOrReplaceChild("left_arm", CubeListBuilder.create()
-                        .texOffs(LEFT_ARM_UV.x(), LEFT_ARM_UV.y())
-                        .addBox(-1, -2, -2, ARM_SIZE, 12, ARM_SIZE, CHESTPLATE_DEFORMATION),
-                PartPose.offset(5, 2, 0));
-
-        PartDefinition body = root.addOrReplaceChild("body", CubeListBuilder.create()
+        PartDefinition body = mesh.getRoot().addOrReplaceChild("body", CubeListBuilder.create()
                         .texOffs(BODY_RIGHT_SIDE_UV.x(), BODY_TOP_UV.y())
                         .addBox(-4, 0, -2, 8, BODY_HEIGHT, 4, CHESTPLATE_DEFORMATION),
                 PartPose.ZERO);
-        body.addOrReplaceChild("front_flap", flap(FRONT_FLAP_OUTER_UV),
+        body.addOrReplaceChild("front_flap", flap(FRONT_FLAP_UV, Direction.NORTH),
                 PartPose.offset(0, BODY_BOTTOM, -BODY_FACE_Z));
-        body.addOrReplaceChild("back_flap", flap(BACK_FLAP_INNER_UV),
+        body.addOrReplaceChild("back_flap", flap(BACK_FLAP_UV, Direction.SOUTH),
                 PartPose.offset(0, BODY_BOTTOM, BODY_FACE_Z));
         return LayerDefinition.create(mesh, TEXTURE_SIZE, TEXTURE_SIZE);
     }
 
-    private static CubeListBuilder flap(Rect2D firstFaceUv) {
+    //a zero depth box puts both its faces on the same plane and they fight, so only the outward one is kept.
+    //armor doesn't cull, so it still shows from the inside, mirrored, like cloth would.
+    //a box lays the north face at its tex offset and the south one right after it
+    private static CubeListBuilder flap(Rect2D uv, Direction outward) {
+        int texU = outward == Direction.NORTH ? uv.x() : uv.x() - FLAP_WIDTH;
         return CubeListBuilder.create()
-                .texOffs(firstFaceUv.x(), firstFaceUv.y())
-                .addBox(-FLAP_WIDTH / 2f, 0, 0, FLAP_WIDTH, FLAP_HEIGHT, 0);
+                .texOffs(texU, uv.y())
+                .addBox(-FLAP_WIDTH / 2f, 0, 0, FLAP_WIDTH, FLAP_HEIGHT, 0, Set.of(outward));
     }
 
     @SuppressWarnings("unchecked")
