@@ -25,13 +25,15 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
     private static final CubeDeformation CHESTPLATE_DEFORMATION = new CubeDeformation(DEFORMATION);
     private static final int FLAP_WIDTH = 10;
     private static final int FLAP_HEIGHT = 4;
+    //two shorter than a vanilla torso, so the cloth stops at the waist and the skirt takes over from there
+    private static final int BODY_HEIGHT = 10;
     //bottom edge of the deformed body box, and how far its faces sit from the center
-    private static final int BODY_BOTTOM = 12 + DEFORMATION;
+    private static final int BODY_BOTTOM = BODY_HEIGHT + DEFORMATION;
     private static final int BODY_FACE_Z = 2 + DEFORMATION;
 
     //the two panels the banner is squeezed onto. a zero depth box lays its two faces side by side, outer one first
-    public static final Rect2D BODY_FRONT_UV = new Rect2D(20, 20, 8, 12);
-    public static final Rect2D BODY_BACK_UV = new Rect2D(32, 20, 8, 12);
+    public static final Rect2D BODY_FRONT_UV = new Rect2D(20, 20, 8, BODY_HEIGHT);
+    public static final Rect2D BODY_BACK_UV = new Rect2D(32, 20, 8, BODY_HEIGHT);
     public static final Rect2D FRONT_FLAP_OUTER_UV = new Rect2D(0, 32, FLAP_WIDTH, FLAP_HEIGHT);
     public static final Rect2D FRONT_FLAP_INNER_UV = new Rect2D(FLAP_WIDTH, 32, FLAP_WIDTH, FLAP_HEIGHT);
     public static final Rect2D BACK_FLAP_INNER_UV = new Rect2D(0, 40, FLAP_WIDTH, FLAP_HEIGHT);
@@ -39,8 +41,8 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
 
     //everything else the pattern spills onto. the torso unfolds as one strip that wraps all the way
     //around: right side runs back to front, then the front panel, then the left side front to back, then the back panel
-    public static final Rect2D BODY_RIGHT_SIDE_UV = new Rect2D(16, 20, 4, 12);
-    public static final Rect2D BODY_LEFT_SIDE_UV = new Rect2D(28, 20, 4, 12);
+    public static final Rect2D BODY_RIGHT_SIDE_UV = new Rect2D(16, 20, 4, BODY_HEIGHT);
+    public static final Rect2D BODY_LEFT_SIDE_UV = new Rect2D(28, 20, 4, BODY_HEIGHT);
     //shoulder tops and the underside, both laid out along the front panel's u
     public static final Rect2D BODY_TOP_UV = new Rect2D(20, 16, 8, 4);
     public static final Rect2D BODY_UNDERSIDE_UV = new Rect2D(28, 16, 8, 4);
@@ -50,7 +52,7 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
     public static final int ARM_SIZE = 4;
 
     //how tall those two panels are on the model, which is not how tall they are on the texture
-    public static final int BODY_FACE_SIZE = 12 + 2 * DEFORMATION;
+    public static final int BODY_FACE_SIZE = BODY_HEIGHT + 2 * DEFORMATION;
     public static final int FLAP_FACE_SIZE = FLAP_HEIGHT;
 
     private final ModelPart frontFlap;
@@ -73,7 +75,10 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
                         .addBox(-1, -2, -2, ARM_SIZE, 12, ARM_SIZE, CHESTPLATE_DEFORMATION),
                 PartPose.offset(5, 2, 0));
 
-        PartDefinition body = root.getChild("body");
+        PartDefinition body = root.addOrReplaceChild("body", CubeListBuilder.create()
+                        .texOffs(BODY_RIGHT_SIDE_UV.x(), BODY_TOP_UV.y())
+                        .addBox(-4, 0, -2, 8, BODY_HEIGHT, 4, CHESTPLATE_DEFORMATION),
+                PartPose.ZERO);
         body.addOrReplaceChild("front_flap", flap(FRONT_FLAP_OUTER_UV),
                 PartPose.offset(0, BODY_BOTTOM, -BODY_FACE_Z));
         body.addOrReplaceChild("back_flap", flap(BACK_FLAP_INNER_UV),

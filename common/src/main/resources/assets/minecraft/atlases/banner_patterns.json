@@ -1,0 +1,7 @@
+[
+  {
+    "type": "minecraft:directory",
+    "source": "models/armor/tabard",
+    "prefix": "models/armor/tabard/"
+  }
+]
