@@ -44,7 +44,9 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
     public static final Rect2D BODY_FRONT_UV = new Rect2D(20, 20, 8, BODY_HEIGHT);
     public static final Rect2D BODY_BACK_UV = new Rect2D(32, 20, 8, BODY_HEIGHT);
     public static final Rect2D FRONT_FLAP_UV = new Rect2D(0, 32, FLAP_WIDTH, FLAP_HEIGHT);
-    public static final Rect2D BACK_FLAP_UV = new Rect2D(3 * FLAP_WIDTH, 32, FLAP_WIDTH, FLAP_HEIGHT);
+    //both flaps are the same box unwrap, so the front takes its north slot and the back the south one
+    //right next to it. nothing is left over between them
+    public static final Rect2D BACK_FLAP_UV = new Rect2D(FLAP_WIDTH, 32, FLAP_WIDTH, FLAP_HEIGHT);
 
     //the rest of the torso the pattern spills onto. it unfolds as one strip that wraps all the way
     //around: right side runs back to front, then the front panel, then the left side front to back, then the back panel
