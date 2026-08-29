@@ -78,25 +78,42 @@ public class PortcullisBlock extends RotatedPillarBlock implements IDirectionalS
         }
         if (level.isClientSide) return InteractionResult.SUCCESS;
 
-        boolean lowering = player.isShiftKeyDown();
-        Direction dir = lowering ? Direction.DOWN : Direction.UP;
-        if (!moveGrate(level, pos, dir)) return InteractionResult.FAIL;
+        Direction dir = player.isShiftKeyDown() ? Direction.DOWN : Direction.UP;
+        if (resolveGrate(level, pos, dir) == null) return InteractionResult.FAIL;
 
-        level.playSound(null, pos, lowering ? SoundEvents.PISTON_CONTRACT : SoundEvents.PISTON_EXTEND,
-                SoundSource.BLOCKS, 0.5f, level.random.nextFloat() * 0.25f + 0.6f);
+        //moving piston block entities are never synced, so like a piston the move runs on both sides from the event
+        level.blockEvent(pos, this, dir.get3DDataValue(), 0);
         return InteractionResult.CONSUME;
     }
 
+    @Override
+    protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
+        Direction dir = Direction.from3DDataValue(id);
+        if (!moveGrate(level, pos, dir)) return false;
+
+        level.playSound(null, pos, dir == Direction.DOWN ? SoundEvents.PISTON_CONTRACT : SoundEvents.PISTON_EXTEND,
+                SoundSource.BLOCKS, 0.5f, level.random.nextFloat() * 0.25f + 0.6f);
+        return true;
+    }
+
     /**
-     * Same handoff a piston does, just with no piston: the structure is resolved as if one sat right
-     * behind the grate, then every block becomes a moving piston block entity that slides on its own.
+     * Resolves the structure as if a piston sat right behind the grate. Null when it can't move.
      */
-    private static boolean moveGrate(Level level, BlockPos clicked, Direction dir) {
+    private static PistonStructureResolver resolveGrate(Level level, BlockPos clicked, Direction dir) {
         BlockPos rear = findRearBlock(level, clicked, dir);
-        if (rear == null) return false;
+        if (rear == null) return null;
 
         PistonStructureResolver resolver = new PistonStructureResolver(level, rear.relative(dir.getOpposite()), dir, true);
-        if (!resolver.resolve()) return false;
+        return resolver.resolve() ? resolver : null;
+    }
+
+    /**
+     * Same handoff a piston does, just with no piston: every resolved block becomes a moving piston
+     * block entity that slides on its own.
+     */
+    private static boolean moveGrate(Level level, BlockPos clicked, Direction dir) {
+        PistonStructureResolver resolver = resolveGrate(level, clicked, dir);
+        if (resolver == null) return false;
 
         List<BlockPos> toPush = resolver.getToPush();
         List<BlockPos> toDestroy = resolver.getToDestroy();

@@ -40,6 +40,10 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
     private static final int BODY_BOTTOM = BODY_HEIGHT + DEFORMATION;
     private static final int BODY_FACE_Z = 2 + DEFORMATION;
 
+    //where vanilla puts the torso on an armor sheet. the chainmail under the cloth is lifted from there
+    private static final int BODY_TEX_U = 16;
+    private static final int BODY_TEX_V = 16;
+
     //the panels the banner is squeezed onto
     public static final Rect2D BODY_FRONT_UV = new Rect2D(20, 20, 8, BODY_HEIGHT);
     public static final Rect2D BODY_BACK_UV = new Rect2D(32, 20, 8, BODY_HEIGHT);
@@ -47,14 +51,12 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
     //both flaps are the same box unwrap, so the front takes its north slot and the back the south one
     //right next to it. nothing is left over between them
     public static final Rect2D BACK_FLAP_UV = new Rect2D(FLAP_WIDTH, 32, FLAP_WIDTH, FLAP_HEIGHT);
-
-    //the rest of the torso the pattern spills onto. it unfolds as one strip that wraps all the way
-    //around: right side runs back to front, then the front panel, then the left side front to back, then the back panel
-    public static final Rect2D BODY_RIGHT_SIDE_UV = new Rect2D(16, 20, 4, BODY_HEIGHT);
-    public static final Rect2D BODY_LEFT_SIDE_UV = new Rect2D(28, 20, 4, BODY_HEIGHT);
-    //shoulder tops and the underside, both laid out along the front panel's u
+    //the cloth carries on over the shoulders. laid out along the front panel's u
     public static final Rect2D BODY_TOP_UV = new Rect2D(20, 16, 8, 4);
-    public static final Rect2D BODY_UNDERSIDE_UV = new Rect2D(28, 16, 8, 4);
+    //middle of that face, where the head comes through. no cloth and no pattern here
+    public static final Rect2D NECK_HOLE_UV = new Rect2D(22, 16, 4, 4);
+    //what is left of the top face on either side of the neck
+    public static final int SHOULDER_WIDTH = (BODY_TOP_UV.width() - NECK_HOLE_UV.width()) / 2;
 
     //how tall those two panels are on the model, which is not how tall they are on the texture
     public static final int BODY_FACE_SIZE = BODY_HEIGHT + 2 * DEFORMATION;
@@ -80,7 +82,7 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
     public static LayerDefinition createLayer() {
         MeshDefinition mesh = HumanoidModel.createMesh(CHESTPLATE_DEFORMATION, 0);
         PartDefinition body = mesh.getRoot().addOrReplaceChild("body", CubeListBuilder.create()
-                        .texOffs(BODY_RIGHT_SIDE_UV.x(), BODY_TOP_UV.y())
+                        .texOffs(BODY_TEX_U, BODY_TEX_V)
                         .addBox(-4, 0, -2, 8, BODY_HEIGHT, 4, CHESTPLATE_DEFORMATION),
                 PartPose.ZERO);
         body.addOrReplaceChild("front_flap", flap(FRONT_FLAP_UV, Direction.NORTH),

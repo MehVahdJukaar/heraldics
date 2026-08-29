@@ -14,15 +14,28 @@ import net.mehvahdjukaar.moonlight.api.util.math.Rect2D;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Turns every banner pattern texture into an armor layer for the tabard chestplate: the flag shrunk
- * onto the torso panels and flaps, ready to be tinted with the layer color like a banner is.
+ * Builds the tabard's textures: the armor piece, our cloth panels over vanilla chainmail, and one armor
+ * layer per banner pattern, the flag shrunk onto the torso panels and flaps so it can be tinted with the
+ * layer color like a banner is.
  */
 public class ModClientDynamicResources extends DynamicClientResourceProvider {
 
     private static final String BANNER_FOLDER = "entity/banner";
+
+    private static final ResourceLocation CHAINMAIL_LAYER =
+            ResourceLocation.withDefaultNamespace("models/armor/chainmail_layer_1");
+    private static final ResourceLocation TABARD_LAYER = FeudalistMod.res("models/armor/tabard_layer_1");
+    //the panels the banner ends up on, drawn by hand. everything they leave uncovered is chainmail
+    private static final ResourceLocation TABARD_CLOTH = FeudalistMod.res("models/armor/tabard_cloth");
+
+    //vanilla lays head, torso and arms of an armor piece on a 64x32 sheet
+    private static final int ARMOR_LAYER_WIDTH = 64;
+    private static final int ARMOR_LAYER_HEIGHT = 32;
 
     private static final int BANNER_TEXTURE_SIZE = 64;
     //front face of the banner flag, a 20x40x1 box at the texture origin. the back of it is this mirrored
@@ -33,9 +46,11 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
             * (float) TabardArmorModel.BODY_FACE_SIZE
             / (TabardArmorModel.BODY_FACE_SIZE + TabardArmorModel.FLAP_FACE_SIZE));
 
+    private static final TextureCollager CHAINMAIL_ONTO_TABARD = mapChainmailOntoTabard();
+    private static final TextureCollager CLOTH_OVER_CHAINMAIL = layClothOverChainmail();
     //rects are in the 64x64 layouts, the collager rescales them to whatever the packs actually use
     private static final TextureCollager FLAG_ONTO_PANELS = mapFlagOntoPanels();
-    private static final TextureCollager PANELS_ONTO_REST = spreadPanelsOverTheRest();
+    private static final TextureCollager PANELS_ONTO_SHOULDERS = spreadPanelsOverShoulders();
 
     public ModClientDynamicResources() {
         super(FeudalistMod.res("generated_pack"), PackGenerationStrategy.CACHED);
@@ -46,6 +61,24 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
      */
     public static ResourceLocation patternLayer(ResourceLocation bannerAsset) {
         return FeudalistMod.res("models/armor/tabard/" + bannerAsset.getNamespace() + "/" + bannerAsset.getPath());
+    }
+
+    /**
+     * The tabard model keeps vanilla's texture offsets for the torso and the arms, so the chainmail sheet
+     * goes over as it is. The flaps hang below it and get nothing, they are cloth all the way.
+     */
+    private static TextureCollager mapChainmailOntoTabard() {
+        return TextureCollager.builder(ARMOR_LAYER_WIDTH, ARMOR_LAYER_HEIGHT,
+                        TabardArmorModel.TEXTURE_SIZE, TabardArmorModel.TEXTURE_SIZE)
+                .copyFrom(0, 0, ARMOR_LAYER_WIDTH, ARMOR_LAYER_HEIGHT).to(0, 0)
+                .build();
+    }
+
+    private static TextureCollager layClothOverChainmail() {
+        int size = TabardArmorModel.TEXTURE_SIZE;
+        return TextureCollager.builder(size, size, size, size)
+                .copyFrom(0, 0, size, size).to(0, 0).blended()
+                .build();
     }
 
     private static TextureCollager mapFlagOntoPanels() {
@@ -66,37 +99,21 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
     }
 
     /**
-     * A pattern that runs off the edge of a panel has to keep going, or the cloth looks like someone cut it
-     * out with scissors. Every torso face around the panels takes the edge it touches and stretches it out.
-     * The arms stay bare so the armor texture shows there.
+     * The two strips of top face on either side of the neck are cloth as well, so each shoulder stretches
+     * out the end of the chest panel's top row it touches.
      */
-    private static TextureCollager spreadPanelsOverTheRest() {
+    private static TextureCollager spreadPanelsOverShoulders() {
         Rect2D front = TabardArmorModel.BODY_FRONT_UV;
-        Rect2D back = TabardArmorModel.BODY_BACK_UV;
-
-        //the four vertical corners of the torso, named after which way each one faces
-        Rect2D frontLeft = front.column(front.width() - 1);
-        Rect2D frontRight = front.column(0);
-        Rect2D backLeft = back.column(0);
-        Rect2D backRight = back.column(back.width() - 1);
+        Rect2D top = TabardArmorModel.BODY_TOP_UV;
+        int strip = TabardArmorModel.SHOULDER_WIDTH;
 
         int size = TabardArmorModel.TEXTURE_SIZE;
-        TextureCollager.Builder builder = TextureCollager.builder(size, size, size, size);
-        //a side face bridges the two panels, so hand half of it to each
-        splitInTwo(builder, TabardArmorModel.BODY_LEFT_SIDE_UV, frontLeft, backLeft);
-        splitInTwo(builder, TabardArmorModel.BODY_RIGHT_SIDE_UV, backRight, frontRight);
-
-        //top and underside of the torso are laid out along the front panel's u. the back panel is the front
-        //mirrored and its u runs the other way, so both ends of these faces want the same row anyway
-        builder.copyFrom(front.row(0)).to(TabardArmorModel.BODY_TOP_UV);
-        builder.copyFrom(front.row(front.height() - 1)).to(TabardArmorModel.BODY_UNDERSIDE_UV);
-        return builder.build();
-    }
-
-    private static void splitInTwo(TextureCollager.Builder builder, Rect2D face, Rect2D firstHalf, Rect2D secondHalf) {
-        int half = face.width() / 2;
-        builder.copyFrom(firstHalf).to(face.x(), face.y(), half, face.height());
-        builder.copyFrom(secondHalf).to(face.x() + half, face.y(), half, face.height());
+        return TextureCollager.builder(size, size, size, size)
+                .copyFrom(front.x(), front.y(), strip, 1)
+                .to(top.x(), top.y(), strip, top.height())
+                .copyFrom(front.x() + front.width() - strip, front.y(), strip, 1)
+                .to(top.x() + top.width() - strip, top.y(), strip, top.height())
+                .build();
     }
 
     @Override
@@ -105,8 +122,30 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
     }
 
     @Override
+    protected Collection<String> gatherSupportedNamespaces() {
+        return List.of();
+    }
+
+    @Override
     protected void regenerateDynamicAssets(Consumer<ResourceGenTask> executor) {
+        executor.accept(this::addTabardArmor);
         executor.accept(this::addTabardPatterns);
+    }
+
+    private void addTabardArmor(ResourceManager manager, ResourceSink sink) {
+        sink.addTextureUnlessPresent(manager, TABARD_LAYER, () -> createArmorLayer(manager));
+    }
+
+    private static TextureImage createArmorLayer(ResourceManager manager) throws Exception {
+        try (TextureImage chainmail = TextureImage.open(manager, CHAINMAIL_LAYER);
+             TextureImage cloth = TextureImage.open(manager, TABARD_CLOTH)) {
+            //the model wants a square sheet, at whatever resolution the pack's chainmail uses
+            int size = chainmail.imageWidth() * TabardArmorModel.TEXTURE_SIZE / ARMOR_LAYER_WIDTH;
+            TextureImage layer = TextureImage.createNew(size, size);
+            CHAINMAIL_ONTO_TABARD.apply(chainmail, layer);
+            CLOTH_OVER_CHAINMAIL.apply(cloth, layer);
+            return layer;
+        }
     }
 
     private void addTabardPatterns(ResourceManager manager, ResourceSink sink) {
@@ -127,7 +166,7 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
             int size = flag.imageWidth() * TabardArmorModel.TEXTURE_SIZE / BANNER_TEXTURE_SIZE;
             TextureImage layer = TextureImage.createNew(size, size);
             FLAG_ONTO_PANELS.apply(flag, layer);
-            PANELS_ONTO_REST.apply(layer, layer);
+            PANELS_ONTO_SHOULDERS.apply(layer, layer);
             return layer;
         }
     }
