@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.mehvahdjukaar.heraldics.mixins.neoforge",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "HumanoidArmorLayerMixin"
+  ],
+  "mixins": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

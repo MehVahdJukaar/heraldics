@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "heraldics:block/portcullis",
+      "y": 90
+    },
+    "axis=y": {
+      "model": "heraldics:block/portcullis",
+      "x": 90
+    },
+    "axis=z": {
+      "model": "heraldics:block/portcullis"
+    }
+  }
+}
