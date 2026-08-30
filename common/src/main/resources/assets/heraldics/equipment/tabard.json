@@ -1,0 +1,19 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "heraldics:tabard"
+      }
+    ],
+    "humanoid_baby": [
+      {
+        "texture": "heraldics:tabard"
+      }
+    ],
+    "horse_body": [
+      {
+        "texture": "heraldics:tabard"
+      }
+    ]
+  }
+}

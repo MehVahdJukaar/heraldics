@@ -19,10 +19,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-/**
- * Grate panel that pistons drag around as one piece. AXIS is the panel normal, so the four faces
- * that fill a whole block side can stick, and only to another panel lying the same way.
- */
 public class PortcullisBlock extends RotatedPillarBlock implements IDirectionalStickyBlock {
 
     private static final VoxelShape X_SHAPE = Block.box(6, 0, 0, 10, 16, 16);
@@ -55,18 +51,16 @@ public class PortcullisBlock extends RotatedPillarBlock implements IDirectionalS
                 && neighbor.getValue(AXIS) == axis;
     }
 
-    //placeholder until the supplementaries winch is there to raise these properly
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (state.getValue(AXIS) == Direction.Axis.Y || PlatHelper.isModLoaded("supplementaries")) {
             return InteractionResult.PASS;
         }
-        if (level.isClientSide) return InteractionResult.SUCCESS;
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
 
         Direction dir = player.isShiftKeyDown() ? Direction.DOWN : Direction.UP;
         if (!PortcullisMover.canMove(level, pos, dir)) return InteractionResult.FAIL;
 
-        //moving piston block entities are never synced, so like a piston the move runs on both sides from the event
         level.blockEvent(pos, this, dir.get3DDataValue(), 0);
         return InteractionResult.CONSUME;
     }
@@ -77,7 +71,7 @@ public class PortcullisBlock extends RotatedPillarBlock implements IDirectionalS
         if (!PortcullisMover.move(level, pos, dir)) return false;
 
         level.playSound(null, pos, dir == Direction.DOWN ? SoundEvents.PISTON_CONTRACT : SoundEvents.PISTON_EXTEND,
-                SoundSource.BLOCKS, 0.5f, level.random.nextFloat() * 0.25f + 0.6f);
+                SoundSource.BLOCKS, 0.5f, level.getRandom().nextFloat() * 0.25f + 0.6f);
         return true;
     }
 }

@@ -2,23 +2,21 @@ package net.mehvahdjukaar.heraldics;
 
 
 import net.mehvahdjukaar.heraldics.common.blocks.PortcullisBlock;
-import net.mehvahdjukaar.heraldics.common.items.TabardChestplateItem;
-import net.mehvahdjukaar.heraldics.common.items.TabardHorseArmorItem;
 import net.mehvahdjukaar.heraldics.common.items.crafting.TabardFromBannerRecipe;
 import net.mehvahdjukaar.moonlight.api.misc.RegSupplier;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.AnimalArmorItem;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorMaterials;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -31,6 +29,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 
@@ -41,18 +40,17 @@ public class HeraldicsMod {
 
     public static final boolean SUPP = PlatHelper.isModLoaded("supplementaries");
 
-    public static ResourceLocation res(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier res(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
     private static final List<Supplier<? extends ItemLike>> TAB_CONTENT = new ArrayList<>();
 
     // add blocks below here
 
-    public static final Supplier<Block> FANCY_STONE = regBlock("fancy_stone",
-            () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)
+    public static final Supplier<Block> FANCY_STONE = regBlock("fancy_stone", Block::new,
+            BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)
                     .destroyTime(2)
-            )
     );
 
     public static final Map<RegHelper.VariantType, Supplier<Block>> FLAGSTONE_BRICKS =
@@ -63,31 +61,27 @@ public class HeraldicsMod {
 
             );
 
-    public static final Supplier<Block> PORTCULLIS = regBlock("portcullis",
-            () -> new PortcullisBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)
+    public static final Supplier<Block> PORTCULLIS = regBlock("portcullis", PortcullisBlock::new,
+            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)
                     .noOcclusion()
-            )
     );
 
     // end blocks
 
     // add items below here
 
-    //same stats as vanilla chainmail, just so our armor pieces can point at our own textures
-    public static final RegSupplier<ArmorMaterial> CHAINMAIL_ARMOR = regChainmailLikeMaterial("chainmail");
-    public static final RegSupplier<ArmorMaterial> TABARD_ARMOR = regChainmailLikeMaterial("tabard");
+    //same stats as vanilla chainmail, just so our armor pieces can point at our own equipment assets
+    public static final ArmorMaterial CHAINMAIL_ARMOR = chainmailLikeMaterial("chainmail");
+    public static final ArmorMaterial TABARD_ARMOR = chainmailLikeMaterial("tabard");
 
-    public static final Supplier<AnimalArmorItem> CHAINMAIL_HORSE_ARMOR = regItem("chainmail_horse_armor",
-            () -> new AnimalArmorItem(CHAINMAIL_ARMOR, AnimalArmorItem.BodyType.EQUESTRIAN, false,
-                    new Item.Properties().stacksTo(1)));
+    public static final Supplier<Item> CHAINMAIL_HORSE_ARMOR = regItem("chainmail_horse_armor", Item::new,
+            new Item.Properties().horseArmor(CHAINMAIL_ARMOR));
 
-    public static final Supplier<TabardChestplateItem> TABARD_CHESTPLATE = regItem("tabard_chestplate",
-            () -> new TabardChestplateItem(TABARD_ARMOR,
-                    new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(15))));
+    public static final Supplier<Item> TABARD_CHESTPLATE = regItem("tabard_chestplate", Item::new,
+            new Item.Properties().humanoidArmor(TABARD_ARMOR, ArmorType.CHESTPLATE));
 
-    public static final Supplier<TabardHorseArmorItem> TABARD_HORSE_ARMOR = regItem("tabard_horse_armor",
-            () -> new TabardHorseArmorItem(TABARD_ARMOR,
-                    new Item.Properties().stacksTo(1)));
+    public static final Supplier<Item> TABARD_HORSE_ARMOR = regItem("tabard_horse_armor", Item::new,
+            new Item.Properties().horseArmor(TABARD_ARMOR));
 
     // end items
 
@@ -102,9 +96,9 @@ public class HeraldicsMod {
             }
     );
 
-    private static RegSupplier<Block> regBlock(String id, Supplier<Block> blockSupplier) {
-        var s = RegHelper.registerBlockWithItem(
-                res(id), blockSupplier);
+    private static <T extends Block> RegSupplier<T> regBlock(String id, Function<BlockBehaviour.Properties, T> factory,
+                                                             BlockBehaviour.Properties properties) {
+        var s = RegHelper.registerBlockWithItem(res(id), factory, properties);
         TAB_CONTENT.add(s);
         return s;
     }
@@ -115,25 +109,23 @@ public class HeraldicsMod {
         return s;
     }
 
-    private static <T extends Item> RegSupplier<T> regItem(String id, Supplier<T> itemSupplier) {
-        var s = RegHelper.registerItem(res(id), itemSupplier);
+    private static <T extends Item> RegSupplier<T> regItem(String id, Function<Item.Properties, T> factory,
+                                                           Item.Properties properties) {
+        var s = RegHelper.registerItem(res(id), factory, properties);
         TAB_CONTENT.add(s);
         return s;
     }
 
-    private static RegSupplier<ArmorMaterial> regChainmailLikeMaterial(String id) {
-        ResourceLocation name = res(id);
-        return RegHelper.register(name, () -> {
-            ArmorMaterial chain = ArmorMaterials.CHAIN.value();
-            return new ArmorMaterial(chain.defense(), chain.enchantmentValue(), chain.equipSound(),
-                    chain.repairIngredient(), List.of(new ArmorMaterial.Layer(name)),
-                    chain.toughness(), chain.knockbackResistance());
-        }, Registries.ARMOR_MATERIAL);
+    private static ArmorMaterial chainmailLikeMaterial(String id) {
+        ArmorMaterial chain = ArmorMaterials.CHAINMAIL;
+        ResourceKey<EquipmentAsset> asset = ResourceKey.create(EquipmentAssets.ROOT_ID, res(id));
+        return new ArmorMaterial(chain.durability(), chain.defense(), chain.enchantmentValue(), chain.equipSound(),
+                chain.toughness(), chain.knockbackResistance(), chain.repairIngredient(), asset);
     }
 
     public static void init() {
         RegHelper.addItemsToTabsRegistration(itemToTabEvent -> {
-            itemToTabEvent.add((ResourceKey<CreativeModeTab>) TAB.getKey(),
+            itemToTabEvent.add(TAB.getKey(),
                     TAB_CONTENT.stream()
                             .map(Supplier::get)
                             .toArray(ItemLike[]::new));

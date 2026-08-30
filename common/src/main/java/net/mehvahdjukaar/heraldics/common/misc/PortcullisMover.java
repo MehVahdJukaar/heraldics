@@ -24,15 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Slides a whole grate one block like a piston would, with no piston. Vanilla's resolver caps a push
- * at 12 blocks grate included, too few for a real portcullis, so this one walks the grate itself and
- * only borrows the piston rules for what sits in front of it.
- * Placeholder until the supplementaries winch moves these.
- */
+//vanilla's push resolver caps at 12 blocks, too few for a portcullis, so this walks the grate itself
+//and only uses the piston rules for what sits in front of it. placeholder until the supplementaries winch moves these
 public class PortcullisMover {
 
-    //grate plus whatever it shoves
     public static final int MAX_MOVED_BLOCKS = 64;
 
     private final Level level;
@@ -49,10 +44,7 @@ public class PortcullisMover {
         return resolve(level, gratePos, dir) != null;
     }
 
-    /**
-     * Moves the grate that contains gratePos. Nothing changes when it returns false.
-     * Run it on both sides, the moving piston block entities it makes are never synced.
-     */
+    //run it on both sides, the moving piston block entities it makes are never synced
     public static boolean move(Level level, BlockPos gratePos, Direction dir) {
         PortcullisMover mover = resolve(level, gratePos, dir);
         if (mover == null) return false;
@@ -68,9 +60,6 @@ public class PortcullisMover {
         return mover.resolve(grate) ? mover : null;
     }
 
-    /**
-     * Flood fill over every block that sticks to the clicked one. Null if the thing is too big.
-     */
     @Nullable
     private static Set<BlockPos> collectGrate(Level level, BlockPos origin) {
         Set<BlockPos> found = new LinkedHashSet<>();
@@ -108,15 +97,11 @@ public class PortcullisMover {
         return true;
     }
 
-    /**
-     * Forward half of vanilla's addBlockLine. Pushed blocks are plain pushed, nothing glued to them
-     * comes along.
-     */
+    //forward half of vanilla's addBlockLine. pushed blocks dont drag glued neighbours along
     private boolean addBlocksInFront(BlockPos origin) {
         BlockPos pos = origin;
         while (true) {
             pos = pos.relative(pushDirection);
-            //that block's own line covers what is past it
             if (toPush.contains(pos)) return true;
             BlockState state = level.getBlockState(pos);
             if (state.isAir()) return true;
@@ -134,10 +119,6 @@ public class PortcullisMover {
         return PistonBaseBlock.isPushable(level.getBlockState(pos), level, pos, pushDirection, allowDestroy, pushDirection);
     }
 
-    /**
-     * Same handoff a piston does: every block becomes a moving piston block entity that slides on its own.
-     * States are read up front so the write order doesn't matter.
-     */
     private void moveBlocks() {
         Map<BlockPos, BlockState> moved = new LinkedHashMap<>();
         for (BlockPos pos : toPush) {

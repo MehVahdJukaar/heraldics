@@ -1,13 +1,11 @@
 package net.mehvahdjukaar.heraldics.common.items.crafting;
 
 import net.mehvahdjukaar.heraldics.HeraldicsMod;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -16,17 +14,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class TabardFromBannerRecipe extends CustomRecipe {
 
-    public TabardFromBannerRecipe(CraftingBookCategory category) {
-        super(category);
-    }
-
     @Override
     public boolean matches(CraftingInput input, Level level) {
         return !craft(input).isEmpty();
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(CraftingInput input) {
         return craft(input);
     }
 
@@ -48,7 +42,6 @@ public class TabardFromBannerRecipe extends CustomRecipe {
 
         if (banner.isEmpty() || armor.isEmpty()) return ItemStack.EMPTY;
 
-        //keeps damage and enchantments of the armor piece
         ItemStack result = armor.transmuteCopy(tabardVersionOf(armor), 1);
         result.set(DataComponents.BANNER_PATTERNS, banner.get(DataComponents.BANNER_PATTERNS));
         result.set(DataComponents.BASE_COLOR, ((BannerItem) banner.getItem()).getColor());
@@ -63,12 +56,7 @@ public class TabardFromBannerRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= 2;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return HeraldicsMod.TABARD_FROM_BANNER.get();
     }
 }
