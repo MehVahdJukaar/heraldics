@@ -49,19 +49,19 @@ public class TabardArmorModel extends HumanoidModel<HumanoidRenderState> {
 
     public TabardArmorModel(ModelPart root) {
         super(root);
-        this.frontFlap = stretchedFlap(this.body.getChild("front_flap"));
-        this.backFlap = stretchedFlap(this.body.getChild("back_flap"));
+        this.frontFlap = this.body.getChild("front_flap");
+        this.backFlap = this.body.getChild("back_flap");
         this.head.visible = false;
         this.hat.visible = false;
         this.rightLeg.visible = false;
         this.leftLeg.visible = false;
     }
 
-    //a deformation grows upwards too and the top edge would end up fighting the torso. scaling only pushes down
-    private static ModelPart stretchedFlap(ModelPart flap) {
-        flap.xScale = FLAP_SCALE;
-        flap.yScale = FLAP_SCALE;
-        return flap;
+    //a deformation grows upwards too and the top edge would end up fighting the torso. scaling only pushes down.
+    //it has to sit in the pose and not on the part: setupAnim resets every part to its initial pose each
+    //frame, and the pose carries scale now. offset is set by hand since PartPose.scaled would scale it too
+    private static PartPose flapPose(float z) {
+        return new PartPose(0, BODY_BOTTOM, z, 0, 0, 0, FLAP_SCALE, FLAP_SCALE, 1);
     }
 
     public static LayerDefinition createLayer() {
@@ -70,10 +70,8 @@ public class TabardArmorModel extends HumanoidModel<HumanoidRenderState> {
                         .texOffs(BODY_TEX_U, BODY_TEX_V)
                         .addBox(-4, 0, -2, 8, BODY_HEIGHT, 4, CHESTPLATE_DEFORMATION),
                 PartPose.ZERO);
-        body.addOrReplaceChild("front_flap", flap(FRONT_FLAP_UV, Direction.NORTH),
-                PartPose.offset(0, BODY_BOTTOM, -BODY_FACE_Z));
-        body.addOrReplaceChild("back_flap", flap(BACK_FLAP_UV, Direction.SOUTH),
-                PartPose.offset(0, BODY_BOTTOM, BODY_FACE_Z));
+        body.addOrReplaceChild("front_flap", flap(FRONT_FLAP_UV, Direction.NORTH), flapPose(-BODY_FACE_Z));
+        body.addOrReplaceChild("back_flap", flap(BACK_FLAP_UV, Direction.SOUTH), flapPose(BODY_FACE_Z));
         return LayerDefinition.create(mesh, TEXTURE_SIZE, TEXTURE_SIZE);
     }
 

@@ -5,6 +5,7 @@ run/
 *.iws
 out/
 *.iml
+*.py
 .gradle/
 output/
 bin/

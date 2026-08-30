@@ -49,11 +49,6 @@ public class HeraldicsMod {
 
     // add blocks below here
 
-    public static final Supplier<Block> FANCY_STONE = regBlock("fancy_stone", Block::new,
-            BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)
-                    .destroyTime(2)
-    );
-
     public static final Map<RegHelper.VariantType, Supplier<Block>> FLAGSTONE_BRICKS =
             regBlockSet("flagstone_bricks",
                     BlockBehaviour.Properties.ofFullCopy(Blocks.GRANITE)
@@ -110,8 +105,8 @@ public class HeraldicsMod {
 
     public static final RegSupplier<CreativeModeTab> TAB = RegHelper.registerCreativeModeTab(
             res("heraldics_tab"), b -> {
-                b.icon(() -> FANCY_STONE.get().asItem().getDefaultInstance())
-                        .title(Component.translatable("aa"));
+                b.icon(() -> TABARD_CHESTPLATE.get().getDefaultInstance())
+                        .title(Component.translatable("itemGroup.heraldics"));
             }
     );
 
