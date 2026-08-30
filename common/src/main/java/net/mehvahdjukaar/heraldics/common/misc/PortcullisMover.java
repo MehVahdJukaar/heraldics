@@ -97,22 +97,17 @@ public class PortcullisMover {
         return true;
     }
 
-    //forward half of vanilla's addBlockLine. pushed blocks dont drag glued neighbours along
+    //the grate cant push anything: whatever sits in front either gets crushed or stops it cold
     private boolean addBlocksInFront(BlockPos origin) {
-        BlockPos pos = origin;
-        while (true) {
-            pos = pos.relative(pushDirection);
-            if (toPush.contains(pos)) return true;
-            BlockState state = level.getBlockState(pos);
-            if (state.isAir()) return true;
-            if (!isPushable(pos, true)) return false;
-            if (state.getPistonPushReaction() == PushReaction.DESTROY) {
-                toDestroy.add(pos);
-                return true;
-            }
-            if (toPush.size() >= MAX_MOVED_BLOCKS) return false;
-            toPush.add(pos);
+        BlockPos pos = origin.relative(pushDirection);
+        if (toPush.contains(pos)) return true;
+        BlockState state = level.getBlockState(pos);
+        if (state.isAir()) return true;
+        if (state.getPistonPushReaction() == PushReaction.DESTROY && isPushable(pos, true)) {
+            toDestroy.add(pos);
+            return true;
         }
+        return false;
     }
 
     private boolean isPushable(BlockPos pos, boolean allowDestroy) {
