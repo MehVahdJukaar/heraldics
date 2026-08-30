@@ -20,6 +20,7 @@ import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.apache.logging.log4j.LogManager;
@@ -61,9 +62,27 @@ public class HeraldicsMod {
 
             );
 
+    public static final Map<RegHelper.VariantType, Supplier<Block>> SANDSTONE_MOSAIC =
+            regBlockSet("sandstone_mosaic",
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.SANDSTONE)
+            );
+
     public static final Supplier<Block> PORTCULLIS = regBlock("portcullis", PortcullisBlock::new,
             BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)
                     .noOcclusion()
+    );
+
+    public static final Supplier<Block> CHISELED_PORTCULLIS = regBlock("chiseled_portcullis", PortcullisBlock::new,
+            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)
+                    .noOcclusion()
+    );
+
+    public static final Supplier<Block> WROUGHT_IRON_FENCE = regBlock("wrought_iron_fence", IronBarsBlock::new,
+            BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS)
+    );
+
+    public static final Supplier<Block> WROUGHT_IRON_RAILING = regBlock("wrought_iron_railing", IronBarsBlock::new,
+            BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS)
     );
 
     // end blocks

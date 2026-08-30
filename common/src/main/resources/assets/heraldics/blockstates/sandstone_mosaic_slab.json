@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "heraldics:block/sandstone_mosaic_slab"
+    },
+    "type=top": {
+      "model": "heraldics:block/sandstone_mosaic_slab_top"
+    },
+    "type=double": {
+      "model": "heraldics:block/sandstone_mosaic"
+    }
+  }
+}

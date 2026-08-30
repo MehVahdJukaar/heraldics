@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "heraldics:block/sandstone_mosaic",
+    "top": "heraldics:block/sandstone_mosaic",
+    "side": "heraldics:block/sandstone_mosaic"
+  }
+}

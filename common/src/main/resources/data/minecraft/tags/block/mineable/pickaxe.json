@@ -1,6 +1,16 @@
 {
   "replace": false,
   "values": [
-    "heraldics:fancy_stone"
+    "heraldics:fancy_stone",
+    "heraldics:flagstone_bricks",
+    "heraldics:flagstone_bricks_stairs",
+    "heraldics:flagstone_bricks_slab",
+    "heraldics:flagstone_bricks_wall",
+    "heraldics:sandstone_mosaic",
+    "heraldics:sandstone_mosaic_stairs",
+    "heraldics:sandstone_mosaic_slab",
+    "heraldics:sandstone_mosaic_wall",
+    "heraldics:wrought_iron_fence",
+    "heraldics:wrought_iron_railing"
   ]
 }

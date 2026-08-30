@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": "heraldics:flagstone_bricks"
+  },
+  "result": {
+    "id": "heraldics:flagstone_bricks_slab",
+    "count": 6
+  }
+}

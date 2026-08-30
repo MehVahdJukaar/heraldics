@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": "heraldics:sandstone_mosaic"
+  },
+  "result": {
+    "id": "heraldics:sandstone_mosaic_stairs",
+    "count": 4
+  }
+}

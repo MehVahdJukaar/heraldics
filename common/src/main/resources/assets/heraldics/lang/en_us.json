@@ -1,5 +1,17 @@
 {
+  "block.heraldics.chiseled_portcullis": "Chiseled Portcullis",
+  "block.heraldics.fancy_stone": "Fancy Stone",
+  "block.heraldics.flagstone_bricks": "Flagstone Bricks",
+  "block.heraldics.flagstone_bricks_slab": "Flagstone Brick Slab",
+  "block.heraldics.flagstone_bricks_stairs": "Flagstone Brick Stairs",
+  "block.heraldics.flagstone_bricks_wall": "Flagstone Brick Wall",
   "block.heraldics.portcullis": "Portcullis",
+  "block.heraldics.sandstone_mosaic": "Sandstone Mosaic",
+  "block.heraldics.sandstone_mosaic_slab": "Sandstone Mosaic Slab",
+  "block.heraldics.sandstone_mosaic_stairs": "Sandstone Mosaic Stairs",
+  "block.heraldics.sandstone_mosaic_wall": "Sandstone Mosaic Wall",
+  "block.heraldics.wrought_iron_fence": "Wrought Iron Fence",
+  "block.heraldics.wrought_iron_railing": "Wrought Iron Railing",
   "item.heraldics.chainmail_horse_armor": "Chainmail Horse Armor",
   "item.heraldics.tabard_chestplate": "Tabard",
   "item.heraldics.tabard_horse_armor": "Horse Tabard"

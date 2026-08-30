@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    [
+      "minecraft:andesite",
+      "minecraft:granite",
+      "minecraft:diorite",
+      "minecraft:cobblestone"
+    ],
+    [
+      "minecraft:andesite",
+      "minecraft:granite",
+      "minecraft:diorite",
+      "minecraft:cobblestone"
+    ],
+    [
+      "minecraft:andesite",
+      "minecraft:granite",
+      "minecraft:diorite",
+      "minecraft:cobblestone"
+    ],
+    [
+      "minecraft:andesite",
+      "minecraft:granite",
+      "minecraft:diorite",
+      "minecraft:cobblestone"
+    ]
+  ],
+  "result": {
+    "id": "heraldics:flagstone_bricks",
+    "count": 4
+  }
+}

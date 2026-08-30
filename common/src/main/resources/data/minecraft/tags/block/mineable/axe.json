@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "heraldics:portcullis"
+    "heraldics:portcullis",
+    "heraldics:chiseled_portcullis"
   ]
 }

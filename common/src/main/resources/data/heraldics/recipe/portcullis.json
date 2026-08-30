@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "SNS",
+    "NSN",
+    "SNS"
+  ],
+  "key": {
+    "S": "minecraft:stick",
+    "N": "minecraft:iron_nugget"
+  },
+  "result": {
+    "id": "heraldics:portcullis",
+    "count": 4
+  }
+}
