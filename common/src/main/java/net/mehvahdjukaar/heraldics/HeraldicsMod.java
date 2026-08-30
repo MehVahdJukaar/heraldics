@@ -88,14 +88,14 @@ public class HeraldicsMod {
     public static final ArmorMaterial CHAINMAIL_ARMOR = chainmailLikeMaterial("chainmail");
     public static final ArmorMaterial TABARD_ARMOR = chainmailLikeMaterial("tabard");
 
-    public static final Supplier<Item> CHAINMAIL_HORSE_ARMOR = regItem("chainmail_horse_armor", Item::new,
-            new Item.Properties().horseArmor(CHAINMAIL_ARMOR));
+    public static final Supplier<Item> CHAINMAIL_HORSE_ARMOR = regItemNotInTab("chainmail_horse_armor",
+            p -> new Item(p.horseArmor(CHAINMAIL_ARMOR)));
 
-    public static final Supplier<Item> TABARD_CHESTPLATE = regItem("tabard_chestplate", Item::new,
-            new Item.Properties().humanoidArmor(TABARD_ARMOR, ArmorType.CHESTPLATE));
+    public static final Supplier<Item> TABARD_CHESTPLATE = regItemNotInTab("tabard_chestplate",
+            p -> new Item(p.humanoidArmor(TABARD_ARMOR, ArmorType.CHESTPLATE)));
 
-    public static final Supplier<Item> TABARD_HORSE_ARMOR = regItem("tabard_horse_armor", Item::new,
-            new Item.Properties().horseArmor(TABARD_ARMOR));
+    public static final Supplier<Item> TABARD_HORSE_ARMOR = regItemNotInTab("tabard_horse_armor",
+            p -> new Item(p.horseArmor(TABARD_ARMOR)));
 
     // end items
 
@@ -121,6 +121,14 @@ public class HeraldicsMod {
         var s = RegHelper.registerFullBlockSet(res(id), prop);
         TAB_CONTENT.addAll(s.values());
         return s;
+    }
+
+    private static <T extends Item> RegSupplier<T> regItem(String id, Function<Item.Properties, T> factory) {
+        return regItem(id, factory, new Item.Properties());
+    }
+
+    private static <T extends Item> RegSupplier<T> regItemNotInTab(String id, Function<Item.Properties, T> factory) {
+        return RegHelper.registerItem(res(id), factory, new Item.Properties());
     }
 
     private static <T extends Item> RegSupplier<T> regItem(String id, Function<Item.Properties, T> factory,
