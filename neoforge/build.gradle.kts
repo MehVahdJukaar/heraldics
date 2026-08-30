@@ -7,6 +7,14 @@ neoforge {
     accessWidener(project(":common"))
 }
 
+neoForge {
+    runs {
+        named("client") {
+            programArguments.addAll("--username", "Dev0")
+        }
+    }
+}
+
 val moonlight_version = extra["moonlight_version"] as String
 val codecui_version = extra["codecui_version"] as String
 

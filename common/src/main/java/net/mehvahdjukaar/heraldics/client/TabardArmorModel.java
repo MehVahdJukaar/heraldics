@@ -9,8 +9,11 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
+import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Rotations;
+import net.minecraft.util.Mth;
 
 import java.util.Set;
 
@@ -51,10 +54,6 @@ public class TabardArmorModel extends HumanoidModel<HumanoidRenderState> {
         super(root);
         this.frontFlap = this.body.getChild("front_flap");
         this.backFlap = this.body.getChild("back_flap");
-        this.head.visible = false;
-        this.hat.visible = false;
-        this.rightLeg.visible = false;
-        this.leftLeg.visible = false;
     }
 
     //a deformation grows upwards too and the top edge would end up fighting the torso. scaling only pushes down.
@@ -66,6 +65,7 @@ public class TabardArmorModel extends HumanoidModel<HumanoidRenderState> {
 
     public static LayerDefinition createLayer() {
         MeshDefinition mesh = HumanoidModel.createMesh(CHESTPLATE_DEFORMATION, 0);
+        stripToChestPieces(mesh.getRoot());
         PartDefinition body = mesh.getRoot().addOrReplaceChild("body", CubeListBuilder.create()
                         .texOffs(BODY_TEX_U, BODY_TEX_V)
                         .addBox(-4, 0, -2, 8, BODY_HEIGHT, 4, CHESTPLATE_DEFORMATION),
@@ -73,6 +73,15 @@ public class TabardArmorModel extends HumanoidModel<HumanoidRenderState> {
         body.addOrReplaceChild("front_flap", flap(FRONT_FLAP_UV, Direction.NORTH), flapPose(-BODY_FACE_Z));
         body.addOrReplaceChild("back_flap", flap(BACK_FLAP_UV, Direction.SOUTH), flapPose(BODY_FACE_Z));
         return LayerDefinition.create(mesh, TEXTURE_SIZE, TEXTURE_SIZE);
+    }
+
+    //hiding the parts isnt enough: loaders that swap in a custom armor model copy the vanilla one's
+    //visibility over ours, and a chestplate model that still has a head and legs then draws a full suit
+    private static void stripToChestPieces(PartDefinition root) {
+        PartDefinition head = root.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
+        head.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
+        root.addOrReplaceChild("right_leg", CubeListBuilder.create(), PartPose.ZERO);
+        root.addOrReplaceChild("left_leg", CubeListBuilder.create(), PartPose.ZERO);
     }
 
     //a zero depth box puts both faces on the same plane and they z fight, so only the outward one is kept
@@ -86,9 +95,26 @@ public class TabardArmorModel extends HumanoidModel<HumanoidRenderState> {
     @Override
     public void setupAnim(HumanoidRenderState state) {
         super.setupAnim(state);
+        if (state instanceof ArmorStandRenderState stand) {
+            poseAsArmorStand(stand);
+        }
         float mostForwardLeg = Math.min(this.rightLeg.xRot, this.leftLeg.xRot);
         float mostBackwardLeg = Math.max(this.rightLeg.xRot, this.leftLeg.xRot);
         this.frontFlap.xRot = mostForwardLeg - this.body.xRot;
         this.backFlap.xRot = mostBackwardLeg - this.body.xRot;
+    }
+
+    //a stand has no walk or breath animation, it just holds the pose it was set to
+    private void poseAsArmorStand(ArmorStandRenderState state) {
+        rotate(this.body, state.bodyPose);
+        rotate(this.rightArm, state.rightArmPose);
+        rotate(this.leftArm, state.leftArmPose);
+        rotate(this.rightLeg, state.rightLegPose);
+        rotate(this.leftLeg, state.leftLegPose);
+    }
+
+    private static void rotate(ModelPart part, Rotations degrees) {
+        part.setRotation(degrees.x() * Mth.DEG_TO_RAD, degrees.y() * Mth.DEG_TO_RAD,
+                degrees.z() * Mth.DEG_TO_RAD);
     }
 }

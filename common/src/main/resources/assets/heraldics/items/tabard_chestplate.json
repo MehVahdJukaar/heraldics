@@ -1,6 +1,15 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "heraldics:item/tabard_chestplate"
+    "model": "heraldics:item/tabard_chestplate",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -1
+      },
+      {
+        "type": "heraldics:base_color"
+      }
+    ]
   }
 }
