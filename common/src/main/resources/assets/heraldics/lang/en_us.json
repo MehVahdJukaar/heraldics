@@ -11,8 +11,12 @@
   "block.heraldics.sandstone_mosaic_wall": "Sandstone Mosaic Wall",
   "block.heraldics.wrought_iron_fence": "Wrought Iron Fence",
   "block.heraldics.wrought_iron_railing": "Wrought Iron Railing",
+  "heraldics.configuration.portcullis": "Portcullis",
+  "heraldics.configuration.portcullis.always_hand_pushable": "Always Hand Pushable",
+  "heraldics.configuration.portcullis.always_hand_pushable.description": "Lets you raise and lower a portcullis by hand even when Supplementaries is on. Off by default so its winch stays the way to move one",
   "item.heraldics.chainmail_horse_armor": "Chainmail Horse Armor",
   "item.heraldics.tabard_chestplate": "Tabard",
   "item.heraldics.tabard_horse_armor": "Horse Tabard",
-  "itemGroup.heraldics": "Heraldics"
+  "itemGroup.heraldics": "Heraldics",
+  "subtitles.heraldics.portcullis.move": "Portcullis moves"
 }

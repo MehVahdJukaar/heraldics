@@ -2,10 +2,10 @@ package net.mehvahdjukaar.heraldics.common.blocks;
 
 import net.mehvahdjukaar.heraldics.HeraldicsMod;
 import net.mehvahdjukaar.heraldics.common.misc.PortcullisMover;
+import net.mehvahdjukaar.heraldics.configs.CommonConfigs;
 import net.mehvahdjukaar.moonlight.api.block.IDirectionalStickyBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -53,9 +53,11 @@ public class PortcullisBlock extends RotatedPillarBlock implements IDirectionalS
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (state.getValue(AXIS) == Direction.Axis.Y || HeraldicsMod.SUPP) {
-            return InteractionResult.PASS;
-        }
+        if (state.getValue(AXIS) == Direction.Axis.Y) return InteractionResult.PASS;
+
+        boolean leaveItToTheWinch = HeraldicsMod.SUPP && !CommonConfigs.ALWAYS_HAND_PUSHABLE.get();
+        if (leaveItToTheWinch) return InteractionResult.PASS;
+
         if (level.isClientSide()) return InteractionResult.SUCCESS;
 
         Direction dir = player.isShiftKeyDown() ? Direction.DOWN : Direction.UP;
@@ -70,8 +72,9 @@ public class PortcullisBlock extends RotatedPillarBlock implements IDirectionalS
         Direction dir = Direction.from3DDataValue(id);
         if (!PortcullisMover.move(level, pos, dir)) return false;
 
-        level.playSound(null, pos, dir == Direction.DOWN ? SoundEvents.PISTON_CONTRACT : SoundEvents.PISTON_EXTEND,
-                SoundSource.BLOCKS, 0.5f, level.getRandom().nextFloat() * 0.25f + 0.6f);
+        float basePitch = dir == Direction.DOWN ? 0.9f : 1.05f;
+        float pitch = basePitch + level.getRandom().nextFloat() * 0.12f - 0.06f;
+        level.playSound(null, pos, HeraldicsMod.PORTCULLIS_MOVE.get(), SoundSource.BLOCKS, 0.8f, pitch);
         return true;
     }
 }

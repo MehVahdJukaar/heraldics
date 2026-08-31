@@ -4,12 +4,14 @@ package net.mehvahdjukaar.heraldics;
 import net.mehvahdjukaar.heraldics.common.blocks.PortcullisBlock;
 import net.mehvahdjukaar.heraldics.common.items.crafting.TabardFromBannerRecipe;
 import net.mehvahdjukaar.heraldics.common.misc.LootInjects;
+import net.mehvahdjukaar.heraldics.configs.CommonConfigs;
 import net.mehvahdjukaar.moonlight.api.misc.RegSupplier;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -100,6 +102,8 @@ public class HeraldicsMod {
 
     // end items
 
+    public static final Supplier<SoundEvent> PORTCULLIS_MOVE = RegHelper.registerSound(res("block.portcullis.move"));
+
     public static final Supplier<RecipeSerializer<TabardFromBannerRecipe>> TABARD_FROM_BANNER =
             RegHelper.registerSpecialRecipe(res("tabard_from_banner"), TabardFromBannerRecipe::new);
 
@@ -147,6 +151,7 @@ public class HeraldicsMod {
     }
 
     public static void init() {
+        CommonConfigs.init();
         LootInjects.init();
         RegHelper.addItemsToTabsRegistration(itemToTabEvent -> {
             itemToTabEvent.add(TAB.getKey(),

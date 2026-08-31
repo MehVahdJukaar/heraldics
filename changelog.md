@@ -1,0 +1,4 @@
+- finished horse tabards
+- proper textures for player tabard
+- sounds
+- fixes
