@@ -21,6 +21,10 @@ public class HeraldicsModClientImpl {
             @Override
             public Model getHumanoidArmorModel(ItemStack stack, EquipmentClientInfo.LayerType layerType,
                                                Model original) {
+                if (layerType != EquipmentClientInfo.LayerType.HUMANOID
+                        && layerType != EquipmentClientInfo.LayerType.HUMANOID_BABY) {
+                    return original;
+                }
                 return HeraldicsModClient.getTabardArmorModel();
             }
         }, HeraldicsMod.TABARD_CHESTPLATE.get());

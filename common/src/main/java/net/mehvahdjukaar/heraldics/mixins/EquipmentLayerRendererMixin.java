@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.heraldics.mixins.neoforge;
+package net.mehvahdjukaar.heraldics.mixins;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.mehvahdjukaar.heraldics.HeraldicsMod;
@@ -21,16 +21,15 @@ public class EquipmentLayerRendererMixin {
 
     @Inject(method = "renderLayers(Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;II)V",
             at = @At("TAIL"))
-    private <S> void heraldics$submitTabardPatterns(EquipmentClientInfo.LayerType layerType,
-                                                    ResourceKey<EquipmentAsset> assetId, Model<? super S> model,
-                                                    S state, ItemStack stack, PoseStack poseStack,
-                                                    SubmitNodeCollector collector, int lightCoords,
-                                                    Identifier playerTextureOverride, int outlineColor, int order,
-                                                    CallbackInfo ci) {
-        boolean isArmorPass = layerType == EquipmentClientInfo.LayerType.HUMANOID
-                || layerType == EquipmentClientInfo.LayerType.HUMANOID_BABY;
-        if (isArmorPass && stack.is(HeraldicsMod.TABARD_CHESTPLATE.get())) {
-            TabardArmorRenderer.submitPatterns(poseStack, collector, lightCoords, stack, model, state, outlineColor);
+    private <S> void heraldics$submitHorseTabard(EquipmentClientInfo.LayerType layerType,
+                                                 ResourceKey<EquipmentAsset> assetId, Model<? super S> model,
+                                                 S state, ItemStack stack, PoseStack poseStack,
+                                                 SubmitNodeCollector collector, int lightCoords,
+                                                 Identifier playerTextureOverride, int outlineColor, int order,
+                                                 CallbackInfo ci) {
+        if (layerType == EquipmentClientInfo.LayerType.HORSE_BODY
+                && stack.is(HeraldicsMod.TABARD_HORSE_ARMOR.get())) {
+            TabardArmorRenderer.submitHorseDrapes(poseStack, collector, lightCoords, stack, state, outlineColor);
         }
     }
 }
