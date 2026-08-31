@@ -45,14 +45,12 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
     private static final int PANEL_WIDTH = 7;
     private static final int PANEL_HEIGHT = 14;
     private static final int PANEL_TOP = 22;
-    private static final int FRONT_LEFT_PANEL_X = 31;
-    private static final int FRONT_RIGHT_PANEL_X = 16;
-    private static final int REAR_LEFT_PANEL_X = 48;
-    private static final int REAR_RIGHT_PANEL_X = 63;
+    private static final int FRONT_LEFT_PANEL_X = 32;
+    private static final int FRONT_RIGHT_PANEL_X = 15;
+    private static final int REAR_LEFT_PANEL_X = 47;
+    private static final int REAR_RIGHT_PANEL_X = 0;
     private static final int[] PANEL_X =
             {FRONT_LEFT_PANEL_X, FRONT_RIGHT_PANEL_X, REAR_LEFT_PANEL_X, REAR_RIGHT_PANEL_X};
-    private static final int[] NEIGHBOUR_X = {-1, 1, 0, 0};
-    private static final int[] NEIGHBOUR_Y = {0, 0, -1, 1};
 
     private static final TextureCollager CHAINMAIL_ONTO_TABARD = mapChainmailOntoTabard();
     private static final TextureCollager CLOTH_OVER_MAIL = layClothOverMail();
@@ -249,46 +247,42 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
         }
     }
 
+    //stretches every panel edge outward like a clamped sampler: each cloth pixel copies the
+    //closest panel's pixel at the clamped position, transparency included. a layer that only
+    //covers part of its panel only ever extends that part
     private static void spreadPanelsOverRestOfCloth(TextureImage layer, TextureImage cloth) {
         int size = layer.imageWidth();
         int scale = Math.max(1, size / HORSE_LAYER_SIZE);
-        int[] queue = new int[size * size];
-        int[] colors = new int[size * size];
-        boolean[] taken = new boolean[size * size];
-        int tail = 0;
-        for (int panelX : PANEL_X) {
-            for (int dy = 0; dy < PANEL_HEIGHT * scale; dy++) {
-                for (int dx = 0; dx < PANEL_WIDTH * scale; dx++) {
-                    int x = (panelX * scale + dx) % size;
-                    int y = PANEL_TOP * scale + dy;
-                    int index = x + y * size;
-                    taken[index] = true;
-                    int color = layer.getPixel(x, y);
-                    if (hasAlpha(color)) {
-                        colors[index] = color;
-                        queue[tail++] = index;
+        int panelWidth = PANEL_WIDTH * scale;
+        int top = PANEL_TOP * scale;
+        int bottom = top + PANEL_HEIGHT * scale - 1;
+        for (int y = 0; y < size; y++) {
+            int clampedY = Math.min(Math.max(y, top), bottom);
+            int dy = Math.abs(y - clampedY);
+            for (int x = 0; x < size; x++) {
+                if (!isSolid(sampleCloth(cloth, x, y, size))) continue;
+                int bestDistance = Integer.MAX_VALUE;
+                int sourceX = x;
+                for (int panelX : PANEL_X) {
+                    //horizontal distance wraps, the side band is continuous around the texture
+                    int rel = Math.floorMod(x - panelX * scale, size);
+                    int dx = 0;
+                    int clampedRel = rel;
+                    if (rel >= panelWidth) {
+                        int pastEnd = rel - panelWidth + 1;
+                        int beforeStart = size - rel;
+                        dx = Math.min(pastEnd, beforeStart);
+                        clampedRel = beforeStart < pastEnd ? 0 : panelWidth - 1;
+                    }
+                    int distance = dx * dx + dy * dy;
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        sourceX = (panelX * scale + clampedRel) % size;
                     }
                 }
-            }
-        }
-        //the flood travels through empty space too, but only paints where the cloth is solid, so
-        //cloth islands cut off by holes still get the closest panel color
-        for (int head = 0; head < tail; head++) {
-            int index = queue[head];
-            int x = index % size;
-            int y = index / size;
-            for (int i = 0; i < NEIGHBOUR_X.length; i++) {
-                int nx = x + NEIGHBOUR_X[i];
-                int ny = y + NEIGHBOUR_Y[i];
-                if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
-                int next = nx + ny * size;
-                if (taken[next]) continue;
-                taken[next] = true;
-                colors[next] = colors[index];
-                if (isSolid(sampleCloth(cloth, nx, ny, size))) {
-                    layer.setPixel(nx, ny, colors[next]);
+                if (sourceX != x || clampedY != y) {
+                    layer.setPixel(x, y, layer.getPixel(sourceX, clampedY));
                 }
-                queue[tail++] = next;
             }
         }
     }
