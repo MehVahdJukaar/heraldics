@@ -23,15 +23,14 @@ public class TabardArmorModel extends HumanoidModel<HumanoidRenderState> {
 
     private static final int DEFORMATION = 1;
     private static final CubeDeformation CHESTPLATE_DEFORMATION = new CubeDeformation(DEFORMATION);
-    //four shorter than a vanilla torso so the cloth stops at the waist. also makes the deformed texels
-    //come out square and torso plus skirt land on the 1:2 a banner flag has
     private static final int BODY_HEIGHT = 8;
     private static final int FLAP_WIDTH = 8;
     private static final int FLAP_HEIGHT = 8;
-    //torso grows a pixel per side from the deformation but keeps its uvs, so the skirt has to match
     private static final float FLAP_SCALE = (8f + 2 * DEFORMATION) / FLAP_WIDTH;
     private static final int BODY_BOTTOM = BODY_HEIGHT + DEFORMATION;
     private static final int BODY_FACE_Z = 2 + DEFORMATION;
+
+    private static final float SEATED_BACK_FLAP = 60 * Mth.DEG_TO_RAD;
 
     private static final int BODY_TEX_U = 16;
     private static final int BODY_TEX_V = 16;
@@ -56,9 +55,6 @@ public class TabardArmorModel extends HumanoidModel<HumanoidRenderState> {
         this.backFlap = this.body.getChild("back_flap");
     }
 
-    //a deformation grows upwards too and the top edge would end up fighting the torso. scaling only pushes down.
-    //it has to sit in the pose and not on the part: setupAnim resets every part to its initial pose each
-    //frame, and the pose carries scale now. offset is set by hand since PartPose.scaled would scale it too
     private static PartPose flapPose(float z) {
         return new PartPose(0, BODY_BOTTOM, z, 0, 0, 0, FLAP_SCALE, FLAP_SCALE, 1);
     }
@@ -75,8 +71,6 @@ public class TabardArmorModel extends HumanoidModel<HumanoidRenderState> {
         return LayerDefinition.create(mesh, TEXTURE_SIZE, TEXTURE_SIZE);
     }
 
-    //hiding the parts isnt enough: loaders that swap in a custom armor model copy the vanilla one's
-    //visibility over ours, and a chestplate model that still has a head and legs then draws a full suit
     private static void stripToChestPieces(PartDefinition root) {
         PartDefinition head = root.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
         head.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
@@ -84,7 +78,6 @@ public class TabardArmorModel extends HumanoidModel<HumanoidRenderState> {
         root.addOrReplaceChild("left_leg", CubeListBuilder.create(), PartPose.ZERO);
     }
 
-    //a zero depth box puts both faces on the same plane and they z fight, so only the outward one is kept
     private static CubeListBuilder flap(Rect2D uv, Direction outward) {
         int texU = outward == Direction.NORTH ? uv.x() : uv.x() - FLAP_WIDTH;
         return CubeListBuilder.create()
@@ -100,11 +93,11 @@ public class TabardArmorModel extends HumanoidModel<HumanoidRenderState> {
         }
         float mostForwardLeg = Math.min(this.rightLeg.xRot, this.leftLeg.xRot);
         float mostBackwardLeg = Math.max(this.rightLeg.xRot, this.leftLeg.xRot);
+        boolean noLegBehind = mostBackwardLeg < 0;
         this.frontFlap.xRot = mostForwardLeg - this.body.xRot;
-        this.backFlap.xRot = mostBackwardLeg - this.body.xRot;
+        this.backFlap.xRot = (noLegBehind ? SEATED_BACK_FLAP : mostBackwardLeg) - this.body.xRot;
     }
 
-    //a stand has no walk or breath animation, it just holds the pose it was set to
     private void poseAsArmorStand(ArmorStandRenderState state) {
         rotate(this.body, state.bodyPose);
         rotate(this.rightArm, state.rightArmPose);

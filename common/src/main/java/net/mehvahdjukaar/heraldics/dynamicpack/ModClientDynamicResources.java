@@ -225,11 +225,13 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
     }
 
     private static TextureImage createPatternLayer(ResourceManager manager, Identifier pattern) throws Exception {
-        try (TextureImage flag = TextureImage.open(manager, pattern)) {
+        try (TextureImage flag = TextureImage.open(manager, pattern);
+             TextureImage cloth = TextureImage.open(manager, TABARD_CLOTH)) {
             int size = flag.imageWidth() * TabardArmorModel.TEXTURE_SIZE / BANNER_TEXTURE_SIZE;
             TextureImage layer = TextureImage.createNew(size, size);
             FLAG_ONTO_PANELS.apply(flag, layer);
             PANELS_ONTO_SHOULDERS.apply(layer, layer);
+            applyClothFabric(layer, cloth);
             return layer;
         }
     }
@@ -242,6 +244,7 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
             FLAG_ONTO_DRAPE.apply(flag, layer);
             DRAPE_ONTO_OTHER_PANELS.apply(layer, layer);
             spreadPanelsOverRestOfCloth(layer, cloth);
+            applyClothFabric(layer, cloth);
             return layer;
         }
     }
@@ -250,6 +253,7 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
         int size = layer.imageWidth();
         int scale = Math.max(1, size / HORSE_LAYER_SIZE);
         int[] queue = new int[size * size];
+        int[] colors = new int[size * size];
         boolean[] taken = new boolean[size * size];
         int tail = 0;
         for (int panelX : PANEL_X) {
@@ -257,24 +261,49 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
                 for (int dx = 0; dx < PANEL_WIDTH * scale; dx++) {
                     int x = (panelX * scale + dx) % size;
                     int y = PANEL_TOP * scale + dy;
-                    taken[x + y * size] = true;
-                    if (hasAlpha(layer.getPixel(x, y))) queue[tail++] = x + y * size;
+                    int index = x + y * size;
+                    taken[index] = true;
+                    int color = layer.getPixel(x, y);
+                    if (hasAlpha(color)) {
+                        colors[index] = color;
+                        queue[tail++] = index;
+                    }
                 }
             }
         }
+        //the flood travels through empty space too, but only paints where the cloth is solid, so
+        //cloth islands cut off by holes still get the closest panel color
         for (int head = 0; head < tail; head++) {
-            int x = queue[head] % size;
-            int y = queue[head] / size;
-            int color = layer.getPixel(x, y);
+            int index = queue[head];
+            int x = index % size;
+            int y = index / size;
             for (int i = 0; i < NEIGHBOUR_X.length; i++) {
                 int nx = x + NEIGHBOUR_X[i];
                 int ny = y + NEIGHBOUR_Y[i];
                 if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
                 int next = nx + ny * size;
-                if (taken[next] || !isSolid(sampleCloth(cloth, nx, ny, size))) continue;
+                if (taken[next]) continue;
                 taken[next] = true;
-                layer.setPixel(nx, ny, color);
+                colors[next] = colors[index];
+                if (isSolid(sampleCloth(cloth, nx, ny, size))) {
+                    layer.setPixel(nx, ny, colors[next]);
+                }
                 queue[tail++] = next;
+            }
+        }
+    }
+
+    //a pattern is only a scissor cutout: its alpha decides where it covers, the fabric look and
+    //shading always come from the cloth underneath
+    private static void applyClothFabric(TextureImage layer, TextureImage cloth) {
+        int size = layer.imageWidth();
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                int color = layer.getPixel(x, y);
+                if (!hasAlpha(color)) continue;
+                int fabric = sampleCloth(cloth, x, y, size);
+                if (!hasAlpha(fabric)) continue;
+                layer.setPixel(x, y, (color & 0xFF000000) | (fabric & 0xFFFFFF));
             }
         }
     }

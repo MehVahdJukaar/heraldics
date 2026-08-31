@@ -29,25 +29,34 @@ public class TabardArmorRenderer {
     private static final Identifier BASE_PATTERN = Identifier.withDefaultNamespace("base");
 
     private static final int FIRST_PATTERN_ORDER = 4;
+    private static final int HORSE_MAIL_ORDER = FIRST_PATTERN_ORDER - 2;
+    private static final int HORSE_CLOTH_ORDER = FIRST_PATTERN_ORDER - 1;
 
     private static final Map<Identifier, SpriteId> SPRITES = new HashMap<>();
     private static final Map<Identifier, Identifier> HORSE_TEXTURES = new HashMap<>();
 
     private static final Identifier HORSE_CLOTH_TEXTURE =
             HeraldicsMod.res("textures/entity/equipment/horse_body/tabard.png");
+    private static final Identifier HORSE_MAIL_TEXTURE =
+            HeraldicsMod.res("textures/entity/equipment/horse_body/tabard_mail.png");
 
-    public static <S> void submitHorseDrapes(PoseStack poseStack, SubmitNodeCollector collector, int lightCoords,
+    @SuppressWarnings("unchecked")
+    public static <S> void submitHorseTabard(PoseStack poseStack, SubmitNodeCollector collector, int lightCoords,
                                              ItemStack stack, S state, int outlineColor) {
         DyeColor baseColor = stack.get(DataComponents.BASE_COLOR);
         if (baseColor == null) return;
 
+        Model<? super S> mail = (Model<? super S>) HeraldicsModClient.getTabardHorseMailModel();
         Model<? super S> drapes = (Model<? super S>) HeraldicsModClient.getTabardHorseArmorModel();
-        int order = FIRST_PATTERN_ORDER - 1;
-        collector.order(order++).submitModel(drapes, state, poseStack,
+        collector.order(HORSE_MAIL_ORDER).submitModel(mail, state, poseStack,
+                RenderTypes.armorCutoutNoCull(HORSE_MAIL_TEXTURE), lightCoords, OverlayTexture.NO_OVERLAY,
+                -1, null, outlineColor, null);
+        collector.order(HORSE_CLOTH_ORDER).submitModel(drapes, state, poseStack,
                 RenderTypes.armorCutoutNoCull(HORSE_CLOTH_TEXTURE), lightCoords, OverlayTexture.NO_OVERLAY,
                 baseColor.getTextureDiffuseColor(), null, outlineColor, null);
 
         BannerPatternLayers patterns = stack.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY);
+        int order = FIRST_PATTERN_ORDER;
         for (BannerPatternLayers.Layer layer : patterns.layers()) {
             submitHorseLayer(poseStack, collector.order(order++), lightCoords, drapes, state,
                     layer.pattern().value().assetId(), layer.color(), RenderTypes::armorTranslucent, outlineColor);

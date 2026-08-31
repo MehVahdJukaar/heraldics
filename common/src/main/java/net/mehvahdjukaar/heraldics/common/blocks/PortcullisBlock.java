@@ -1,8 +1,8 @@
 package net.mehvahdjukaar.heraldics.common.blocks;
 
+import net.mehvahdjukaar.heraldics.HeraldicsMod;
 import net.mehvahdjukaar.heraldics.common.misc.PortcullisMover;
 import net.mehvahdjukaar.moonlight.api.block.IDirectionalStickyBlock;
-import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -53,7 +53,7 @@ public class PortcullisBlock extends RotatedPillarBlock implements IDirectionalS
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (state.getValue(AXIS) == Direction.Axis.Y || PlatHelper.isModLoaded("supplementaries")) {
+        if (state.getValue(AXIS) == Direction.Axis.Y || HeraldicsMod.SUPP) {
             return InteractionResult.PASS;
         }
         if (level.isClientSide()) return InteractionResult.SUCCESS;

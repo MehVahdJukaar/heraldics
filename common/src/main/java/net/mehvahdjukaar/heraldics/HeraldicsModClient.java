@@ -3,6 +3,7 @@ package net.mehvahdjukaar.heraldics;
 import net.mehvahdjukaar.candlelight.api.PlatformImpl;
 import net.mehvahdjukaar.heraldics.client.TabardArmorModel;
 import net.mehvahdjukaar.heraldics.client.TabardHorseArmorModel;
+import net.mehvahdjukaar.heraldics.client.TabardHorseMailModel;
 import net.mehvahdjukaar.heraldics.dynamicpack.ModClientDynamicResources;
 import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
@@ -18,19 +19,25 @@ public class HeraldicsModClient {
     public static final ModelLayerLocation TABARD_HORSE_ARMOR_LAYER =
             new ModelLayerLocation(HeraldicsMod.res("tabard_horse_armor"), "main");
 
+    public static final ModelLayerLocation TABARD_HORSE_MAIL_LAYER =
+            new ModelLayerLocation(HeraldicsMod.res("tabard_horse_mail"), "main");
+
     private static TabardArmorModel tabardArmorModel;
     private static TabardHorseArmorModel tabardHorseArmorModel;
+    private static TabardHorseMailModel tabardHorseMailModel;
 
     public static void init() {
         RegHelper.registerDynamicResourceProvider(new ModClientDynamicResources());
         ClientHelper.addModelLayerRegistration(e -> {
             e.register(TABARD_ARMOR_LAYER, TabardArmorModel::createLayer);
             e.register(TABARD_HORSE_ARMOR_LAYER, TabardHorseArmorModel::createLayer);
+            e.register(TABARD_HORSE_MAIL_LAYER, TabardHorseMailModel::createLayer);
         });
         ClientHelper.addClientReloadListener(
                 () -> (ResourceManagerReloadListener) manager -> {
                     tabardArmorModel = null;
                     tabardHorseArmorModel = null;
+                    tabardHorseMailModel = null;
                 },
                 HeraldicsMod.res("tabard_armor_model"));
         registerArmorRenderers();
@@ -50,6 +57,14 @@ public class HeraldicsModClient {
                     Minecraft.getInstance().getEntityModels().bakeLayer(TABARD_HORSE_ARMOR_LAYER));
         }
         return tabardHorseArmorModel;
+    }
+
+    public static TabardHorseMailModel getTabardHorseMailModel() {
+        if (tabardHorseMailModel == null) {
+            tabardHorseMailModel = new TabardHorseMailModel(
+                    Minecraft.getInstance().getEntityModels().bakeLayer(TABARD_HORSE_MAIL_LAYER));
+        }
+        return tabardHorseMailModel;
     }
 
     @PlatformImpl
