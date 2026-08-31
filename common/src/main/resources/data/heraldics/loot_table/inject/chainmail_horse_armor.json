@@ -1,0 +1,20 @@
+{
+  "pools": [
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "random_chance",
+          "chance": 0.15
+        }
+      ],
+      "entries": [
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "heraldics:chainmail_horse_armor"
+        }
+      ]
+    }
+  ]
+}

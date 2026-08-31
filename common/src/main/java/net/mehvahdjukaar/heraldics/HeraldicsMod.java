@@ -3,6 +3,7 @@ package net.mehvahdjukaar.heraldics;
 
 import net.mehvahdjukaar.heraldics.common.blocks.PortcullisBlock;
 import net.mehvahdjukaar.heraldics.common.items.crafting.TabardFromBannerRecipe;
+import net.mehvahdjukaar.heraldics.common.misc.LootInjects;
 import net.mehvahdjukaar.moonlight.api.misc.RegSupplier;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
@@ -146,6 +147,7 @@ public class HeraldicsMod {
     }
 
     public static void init() {
+        LootInjects.init();
         RegHelper.addItemsToTabsRegistration(itemToTabEvent -> {
             itemToTabEvent.add(TAB.getKey(),
                     TAB_CONTENT.stream()

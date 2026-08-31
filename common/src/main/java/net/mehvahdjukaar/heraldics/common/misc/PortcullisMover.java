@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//vanilla's push resolver caps at 12 blocks, too few for a portcullis, so this walks the grate itself
-//and only uses the piston rules for what sits in front of it. placeholder until the supplementaries winch moves these
+//heavily based off the piston movement code. independent from pistons
 public class PortcullisMover {
 
     public static final int MAX_MOVED_BLOCKS = 64;
@@ -44,7 +43,6 @@ public class PortcullisMover {
         return resolve(level, gratePos, dir) != null;
     }
 
-    //run it on both sides, the moving piston block entities it makes are never synced
     public static boolean move(Level level, BlockPos gratePos, Direction dir) {
         PortcullisMover mover = resolve(level, gratePos, dir);
         if (mover == null) return false;
@@ -97,7 +95,6 @@ public class PortcullisMover {
         return true;
     }
 
-    //the grate cant push anything: whatever sits in front either gets crushed or stops it cold
     private boolean addBlocksInFront(BlockPos origin) {
         BlockPos pos = origin.relative(pushDirection);
         if (toPush.contains(pos)) return true;
