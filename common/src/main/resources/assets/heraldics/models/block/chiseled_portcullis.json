@@ -18,12 +18,14 @@
           "texture": "#panel"
         },
         "west": {
-          "uv": [0, 0, 4, 16],
-          "texture": "#panel"
+          "uv": [16, 0, 12, 16],
+          "texture": "#panel",
+          "cullface": "west"
         },
         "east": {
-          "uv": [12, 0, 16, 16],
-          "texture": "#panel"
+          "uv": [4, 0, 0, 16],
+          "texture": "#panel",
+          "cullface": "east"
         },
         "up": {
           "uv": [0, 0, 16, 4],
@@ -31,7 +33,7 @@
           "cullface": "up"
         },
         "down": {
-          "uv": [0, 12, 16, 16],
+          "uv": [0, 4, 16, 0],
           "texture": "#panel",
           "cullface": "down"
         }

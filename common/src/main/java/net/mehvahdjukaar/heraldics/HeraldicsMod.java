@@ -88,7 +88,7 @@ public class HeraldicsMod {
     public static final ArmorMaterial CHAINMAIL_ARMOR = chainmailLikeMaterial("chainmail");
     public static final ArmorMaterial TABARD_ARMOR = chainmailLikeMaterial("tabard");
 
-    public static final Supplier<Item> CHAINMAIL_HORSE_ARMOR = regItemNotInTab("chainmail_horse_armor",
+    public static final Supplier<Item> CHAINMAIL_HORSE_ARMOR = regItem("chainmail_horse_armor",
             p -> new Item(p.horseArmor(CHAINMAIL_ARMOR)));
 
     public static final Supplier<Item> TABARD_CHESTPLATE = regItemNotInTab("tabard_chestplate",

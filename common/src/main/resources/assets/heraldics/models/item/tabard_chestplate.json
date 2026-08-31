@@ -1,7 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "minecraft:item/chainmail_chestplate",
-    "layer1": "heraldics:item/tabard_chestplate_overlay"
+    "layer0": "heraldics:item/tabard_chestplate"
   }
 }
