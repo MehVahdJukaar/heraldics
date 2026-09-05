@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/template_bars_post",
+  "parent": "minecraft:block/iron_bars_post",
   "textures": {
     "bars": "heraldics:block/wrought_iron_fence",
     "edge": "heraldics:block/wrought_iron_fence"
