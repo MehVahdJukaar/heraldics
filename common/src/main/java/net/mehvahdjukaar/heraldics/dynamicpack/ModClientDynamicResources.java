@@ -18,11 +18,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * Builds the tabard's textures: the armor piece, our cloth panels over vanilla chainmail, and one armor
- * layer per banner pattern, the flag shrunk onto the torso panels and flaps so it can be tinted with the
- * layer color like a banner is.
- */
 public class ModClientDynamicResources extends DynamicClientResourceProvider {
 
     private static final String BANNER_FOLDER = "entity/banner";
@@ -30,43 +25,58 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
     private static final ResourceLocation CHAINMAIL_LAYER =
             ResourceLocation.withDefaultNamespace("models/armor/chainmail_layer_1");
     private static final ResourceLocation TABARD_LAYER = HeraldicsMod.res("models/armor/tabard_layer_1");
-    //the panels the banner ends up on, drawn by hand. everything they leave uncovered is chainmail
     private static final ResourceLocation TABARD_CLOTH = HeraldicsMod.res("models/armor/tabard_cloth");
 
-    //vanilla lays head, torso and arms of an armor piece on a 64x32 sheet
+    private static final ResourceLocation TABARD_HORSE_MAIL_LAYER =
+            HeraldicsMod.res("entity/horse/armor/horse_armor_tabard_mail");
+    private static final ResourceLocation TABARD_HORSE_MAIL = HeraldicsMod.res("models/armor/tabard_horse_mail");
+    private static final ResourceLocation TABARD_HORSE_CLOTH =
+            HeraldicsMod.res("entity/horse/armor/horse_armor_tabard");
+
     private static final int ARMOR_LAYER_WIDTH = 64;
     private static final int ARMOR_LAYER_HEIGHT = 32;
 
     private static final int BANNER_TEXTURE_SIZE = 64;
-    //front face of the banner flag, a 20x40x1 box at the texture origin. the back of it is this mirrored
     private static final Rect2D FLAG_FACE = new Rect2D(1, 1, 20, 40);
 
-    //the flag is way taller than the tabard, so it gets split over the chest and the flap below it
     private static final int FLAG_ROWS_ON_CHEST = Math.round(FLAG_FACE.height()
             * (float) TabardArmorModel.BODY_FACE_SIZE
             / (TabardArmorModel.BODY_FACE_SIZE + TabardArmorModel.FLAP_FACE_SIZE));
 
+    private static final int HORSE_LAYER_SIZE = 64;
+    private static final int PANEL_WIDTH = 7;
+    private static final int PANEL_HEIGHT = 14;
+    private static final int PANEL_TOP = 22;
+    private static final int FRONT_LEFT_PANEL_X = 32;
+    private static final int FRONT_RIGHT_PANEL_X = 15;
+    private static final int REAR_LEFT_PANEL_X = 47;
+    private static final int REAR_RIGHT_PANEL_X = 0;
+    private static final int[] PANEL_X =
+            {FRONT_LEFT_PANEL_X, FRONT_RIGHT_PANEL_X, REAR_LEFT_PANEL_X, REAR_RIGHT_PANEL_X};
+
     private static final TextureCollager CHAINMAIL_ONTO_TABARD = mapChainmailOntoTabard();
     private static final TextureCollager CLOTH_OVER_CHAINMAIL = layClothOverChainmail();
-    //rects are in the 64x64 layouts, the collager rescales them to whatever the packs actually use
     private static final TextureCollager FLAG_ONTO_PANELS = mapFlagOntoPanels();
     private static final TextureCollager PANELS_ONTO_SHOULDERS = spreadPanelsOverShoulders();
+    private static final TextureCollager FLAG_ONTO_DRAPE = mapFlagOntoDrape();
+    private static final TextureCollager DRAPE_ONTO_OTHER_PANELS = spreadDrapeOverOtherPanels();
 
     public ModClientDynamicResources() {
         super(HeraldicsMod.res("generated_pack"), PackGenerationStrategy.CACHED);
     }
 
-    /**
-     * Location of the armor layer generated for a banner pattern, relative as texture helpers want it.
-     */
     public static ResourceLocation patternLayer(ResourceLocation bannerAsset) {
-        return HeraldicsMod.res("models/armor/tabard/" + bannerAsset.getNamespace() + "/" + bannerAsset.getPath());
+        return patternLayer("models/armor/tabard/", bannerAsset);
     }
 
-    /**
-     * The tabard model keeps vanilla's texture offsets for the torso and the arms, so the chainmail sheet
-     * goes over as it is. The flaps hang below it and get nothing, they are cloth all the way.
-     */
+    public static ResourceLocation horsePatternLayer(ResourceLocation bannerAsset) {
+        return patternLayer("models/armor/tabard_horse/", bannerAsset);
+    }
+
+    private static ResourceLocation patternLayer(String folder, ResourceLocation bannerAsset) {
+        return HeraldicsMod.res(folder + bannerAsset.getNamespace() + "/" + bannerAsset.getPath());
+    }
+
     private static TextureCollager mapChainmailOntoTabard() {
         return TextureCollager.builder(ARMOR_LAYER_WIDTH, ARMOR_LAYER_HEIGHT,
                         TabardArmorModel.TEXTURE_SIZE, TabardArmorModel.TEXTURE_SIZE)
@@ -86,9 +96,6 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
         Rect2D onFlap = new Rect2D(FLAG_FACE.x(), FLAG_FACE.y() + FLAG_ROWS_ON_CHEST,
                 FLAG_FACE.width(), FLAG_FACE.height() - FLAG_ROWS_ON_CHEST);
 
-        //the flag shrinks a lot here, box sampling is the only one that keeps the pattern readable.
-        //the back panel's u runs the other way round the body, so mirroring the flag there makes both sides
-        //show the same design, like a banner does
         return TextureCollager.builder(BANNER_TEXTURE_SIZE, BANNER_TEXTURE_SIZE,
                         TabardArmorModel.TEXTURE_SIZE, TabardArmorModel.TEXTURE_SIZE)
                 .copyFrom(onChest).to(TabardArmorModel.BODY_FRONT_UV).boxScaling()
@@ -98,10 +105,6 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
                 .build();
     }
 
-    /**
-     * The two strips of top face on either side of the neck are cloth as well, so each shoulder stretches
-     * out the end of the chest panel's top row it touches.
-     */
     private static TextureCollager spreadPanelsOverShoulders() {
         Rect2D front = TabardArmorModel.BODY_FRONT_UV;
         Rect2D top = TabardArmorModel.BODY_TOP_UV;
@@ -114,6 +117,38 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
                 .copyFrom(front.x() + front.width() - strip, front.y(), strip, 1)
                 .to(top.x() + top.width() - strip, top.y(), strip, top.height())
                 .build();
+    }
+
+    private static TextureCollager mapFlagOntoDrape() {
+        return TextureCollager.builder(BANNER_TEXTURE_SIZE, BANNER_TEXTURE_SIZE, HORSE_LAYER_SIZE, HORSE_LAYER_SIZE)
+                .copyFrom(FLAG_FACE)
+                .to(FRONT_LEFT_PANEL_X, PANEL_TOP, PANEL_WIDTH, PANEL_HEIGHT).boxScaling()
+                .build();
+    }
+
+    private static TextureCollager spreadDrapeOverOtherPanels() {
+        TextureCollager.Builder builder = TextureCollager.builder(HORSE_LAYER_SIZE, HORSE_LAYER_SIZE,
+                HORSE_LAYER_SIZE, HORSE_LAYER_SIZE);
+        copyPanel(builder, FRONT_RIGHT_PANEL_X, true);
+        copyPanel(builder, REAR_LEFT_PANEL_X, true);
+        copyPanel(builder, REAR_RIGHT_PANEL_X, false);
+        return builder.build();
+    }
+
+    private static void copyPanel(TextureCollager.Builder builder, int x, boolean mirrored) {
+        int beforeSeam = Math.min(PANEL_WIDTH, HORSE_LAYER_SIZE - x);
+        copyPanelSlice(builder, 0, beforeSeam, x, mirrored);
+        if (beforeSeam < PANEL_WIDTH) {
+            copyPanelSlice(builder, beforeSeam, PANEL_WIDTH - beforeSeam, 0, mirrored);
+        }
+    }
+
+    private static void copyPanelSlice(TextureCollager.Builder builder, int column, int width, int x, boolean mirrored) {
+        int sourceColumn = mirrored ? PANEL_WIDTH - column - width : column;
+        builder.copyFrom(FRONT_LEFT_PANEL_X + sourceColumn, PANEL_TOP, width, PANEL_HEIGHT).to(x, PANEL_TOP);
+        if (mirrored) {
+            builder.flippedX();
+        }
     }
 
     @Override
@@ -129,6 +164,7 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
     @Override
     protected void regenerateDynamicAssets(Consumer<ResourceGenTask> executor) {
         executor.accept(this::addTabardArmor);
+        executor.accept(this::addHorseTabardMail);
         executor.accept(this::addTabardPatterns);
     }
 
@@ -148,12 +184,42 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
         }
     }
 
+    private void addHorseTabardMail(ResourceManager manager, ResourceSink sink) {
+        sink.addTextureUnlessPresent(manager, TABARD_HORSE_MAIL_LAYER, () -> createHorseMailLayer(manager));
+    }
+
+    private static TextureImage createHorseMailLayer(ResourceManager manager) throws Exception {
+        try (TextureImage mail = TextureImage.open(manager, TABARD_HORSE_MAIL);
+             TextureImage cloth = TextureImage.open(manager, TABARD_HORSE_CLOTH)) {
+            TextureImage layer = mail.makeCopy();
+            cutClothFromMail(layer, cloth, 0, 54, 0, 22, 64, 10);
+            cutClothFromMail(layer, cloth, 22, 32, 22, 0, 10, 22);
+            cutClothFromMail(layer, cloth, 32, 32, 32, 0, 10, 22);
+            return layer;
+        }
+    }
+
+    private static void cutClothFromMail(TextureImage mail, TextureImage cloth, int mailX, int mailY,
+                                         int clothX, int clothY, int width, int height) {
+        int scale = Math.max(1, mail.imageWidth() / HORSE_LAYER_SIZE);
+        for (int y = 0; y < height * scale; y++) {
+            for (int x = 0; x < width * scale; x++) {
+                if (isSolid(sampleCloth(cloth, clothX * scale + x, clothY * scale + y, mail.imageWidth()))) {
+                    mail.setPixel(mailX * scale + x, mailY * scale + y, 0);
+                }
+            }
+        }
+    }
+
     private void addTabardPatterns(ResourceManager manager, ResourceSink sink) {
         try {
             for (ResourceLocation pattern : ResType.TEXTURES.listRelative(manager, BANNER_FOLDER, false)) {
+                ResourceLocation bannerAsset = bannerAssetOf(pattern);
                 //a hand drawn layer sitting at that path wins over anything we could come up with here
-                sink.addTextureUnlessPresent(manager, patternLayer(bannerAssetOf(pattern)),
+                sink.addTextureUnlessPresent(manager, patternLayer(bannerAsset),
                         () -> createPatternLayer(manager, pattern));
+                sink.addTextureUnlessPresent(manager, horsePatternLayer(bannerAsset),
+                        () -> createHorsePatternLayer(manager, pattern));
             }
         } catch (Exception e) {
             HeraldicsMod.LOGGER.error("Failed to generate tabard armor layers: ", e);
@@ -161,14 +227,89 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
     }
 
     private static TextureImage createPatternLayer(ResourceManager manager, ResourceLocation pattern) throws Exception {
-        try (TextureImage flag = TextureImage.open(manager, pattern)) {
-            //keep whatever resolution the pattern pack uses
+        try (TextureImage flag = TextureImage.open(manager, pattern);
+             TextureImage cloth = TextureImage.open(manager, TABARD_CLOTH)) {
             int size = flag.imageWidth() * TabardArmorModel.TEXTURE_SIZE / BANNER_TEXTURE_SIZE;
             TextureImage layer = TextureImage.createNew(size, size);
             FLAG_ONTO_PANELS.apply(flag, layer);
             PANELS_ONTO_SHOULDERS.apply(layer, layer);
+            applyClothFabric(layer, cloth);
             return layer;
         }
+    }
+
+    private static TextureImage createHorsePatternLayer(ResourceManager manager, ResourceLocation pattern) throws Exception {
+        try (TextureImage flag = TextureImage.open(manager, pattern);
+             TextureImage cloth = TextureImage.open(manager, TABARD_HORSE_CLOTH)) {
+            int size = flag.imageWidth() * HORSE_LAYER_SIZE / BANNER_TEXTURE_SIZE;
+            TextureImage layer = TextureImage.createNew(size, size);
+            FLAG_ONTO_DRAPE.apply(flag, layer);
+            DRAPE_ONTO_OTHER_PANELS.apply(layer, layer);
+            spreadPanelsOverRestOfCloth(layer, cloth);
+            applyClothFabric(layer, cloth);
+            return layer;
+        }
+    }
+
+    private static void spreadPanelsOverRestOfCloth(TextureImage layer, TextureImage cloth) {
+        int size = layer.imageWidth();
+        int scale = Math.max(1, size / HORSE_LAYER_SIZE);
+        int panelWidth = PANEL_WIDTH * scale;
+        int top = PANEL_TOP * scale;
+        int bottom = top + PANEL_HEIGHT * scale - 1;
+        for (int y = 0; y < size; y++) {
+            int clampedY = Math.min(Math.max(y, top), bottom);
+            int dy = Math.abs(y - clampedY);
+            for (int x = 0; x < size; x++) {
+                if (!isSolid(sampleCloth(cloth, x, y, size))) continue;
+                int bestDistance = Integer.MAX_VALUE;
+                int sourceX = x;
+                for (int panelX : PANEL_X) {
+                    int rel = Math.floorMod(x - panelX * scale, size);
+                    int dx = 0;
+                    int clampedRel = rel;
+                    if (rel >= panelWidth) {
+                        int pastEnd = rel - panelWidth + 1;
+                        int beforeStart = size - rel;
+                        dx = Math.min(pastEnd, beforeStart);
+                        clampedRel = beforeStart < pastEnd ? 0 : panelWidth - 1;
+                    }
+                    int distance = dx * dx + dy * dy;
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        sourceX = (panelX * scale + clampedRel) % size;
+                    }
+                }
+                if (sourceX != x || clampedY != y) {
+                    layer.setPixel(x, y, layer.getPixel(sourceX, clampedY));
+                }
+            }
+        }
+    }
+
+    private static void applyClothFabric(TextureImage layer, TextureImage cloth) {
+        int size = layer.imageWidth();
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                int color = layer.getPixel(x, y);
+                if (!hasAlpha(color)) continue;
+                int fabric = sampleCloth(cloth, x, y, size);
+                if (!hasAlpha(fabric)) continue;
+                layer.setPixel(x, y, (color & 0xFF000000) | (fabric & 0xFFFFFF));
+            }
+        }
+    }
+
+    private static int sampleCloth(TextureImage cloth, int x, int y, int layerSize) {
+        return cloth.getPixel(x * cloth.imageWidth() / layerSize, y * cloth.imageHeight() / layerSize);
+    }
+
+    private static boolean isSolid(int color) {
+        return (color >>> 24) == 0xFF;
+    }
+
+    private static boolean hasAlpha(int color) {
+        return (color >>> 24) != 0;
     }
 
     private static ResourceLocation bannerAssetOf(ResourceLocation pattern) {

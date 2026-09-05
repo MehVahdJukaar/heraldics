@@ -12,7 +12,7 @@
     "sources": "${mod_github}"
   },
   "license": "${mod_license}",
-  "icon": "icon.png",
+  "icon": "icon2.png",
   "accessWidener": "heraldics.accesswidener",
   "environment": "*",
   "entrypoints": {
@@ -25,7 +25,7 @@
     "${mod_id}-common.mixins.json"
   ],
   "depends": {
-    "fabric": "*",
+    "fabric-api": "*",
     "minecraft": "=${minecraft_version}",
     "moonlight": ">=${moonlight_min_version}"
   },

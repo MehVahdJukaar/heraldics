@@ -12,16 +12,11 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
-
-/**
- * Draws the horse tabard in place of the plain armor pass. It is three models over each other,
- * so there is nothing here for vanilla's one texture one model layer to do.
- */
 @Mixin(HorseArmorLayer.class)
 public abstract class HorseArmorLayerMixin extends RenderLayer<Horse, HorseModel<Horse>> {
 
@@ -39,12 +34,18 @@ public abstract class HorseArmorLayerMixin extends RenderLayer<Horse, HorseModel
 
         HorseModel<Horse> mail = HeraldicsModClient.getTabardHorseMailModel();
         HorseModel<Horse> drapes = HeraldicsModClient.getTabardHorseArmorModel();
-        for (HorseModel<Horse> model : List.of(mail, drapes)) {
-            this.getParentModel().copyPropertiesTo(model);
-            model.prepareMobModel(horse, limbSwing, limbSwingAmount, partialTick);
-            model.setupAnim(horse, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        }
+        heraldics$poseLike(mail, horse, limbSwing, limbSwingAmount, partialTick, ageInTicks, netHeadYaw, headPitch);
+        heraldics$poseLike(drapes, horse, limbSwing, limbSwingAmount, partialTick, ageInTicks, netHeadYaw, headPitch);
+
         TabardArmorRenderer.renderHorseTabard(poseStack, buffer, packedLight, stack, mail, drapes);
         ci.cancel();
+    }
+
+    @Unique
+    private void heraldics$poseLike(HorseModel<Horse> model, Horse horse, float limbSwing, float limbSwingAmount,
+                                    float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
+        this.getParentModel().copyPropertiesTo(model);
+        model.prepareMobModel(horse, limbSwing, limbSwingAmount, partialTick);
+        model.setupAnim(horse, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
     }
 }
