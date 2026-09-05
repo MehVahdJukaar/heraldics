@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "P",
+    "P"
+  ],
+  "key": {
+    "P": {
+      "item": "heraldics:portcullis"
+    }
+  },
+  "result": {
+    "id": "heraldics:chiseled_portcullis",
+    "count": 2
+  }
+}

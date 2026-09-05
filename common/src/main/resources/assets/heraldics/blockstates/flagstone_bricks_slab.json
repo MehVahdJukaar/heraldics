@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "heraldics:block/flagstone_bricks_slab"
+    },
+    "type=top": {
+      "model": "heraldics:block/flagstone_bricks_slab_top"
+    },
+    "type=double": {
+      "model": "heraldics:block/flagstone_bricks"
+    }
+  }
+}

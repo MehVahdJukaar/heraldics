@@ -1,0 +1,10 @@
+{
+  "block.portcullis.move": {
+    "subtitle": "subtitles.heraldics.portcullis.move",
+    "sounds": [
+      "heraldics:block/portcullis_move1",
+      "heraldics:block/portcullis_move2",
+      "heraldics:block/portcullis_move3"
+    ]
+  }
+}

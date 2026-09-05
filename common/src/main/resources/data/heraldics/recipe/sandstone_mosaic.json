@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "SR",
+    "RS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:sandstone"
+    },
+    "R": {
+      "item": "minecraft:red_sandstone"
+    }
+  },
+  "result": {
+    "id": "heraldics:sandstone_mosaic",
+    "count": 4
+  }
+}

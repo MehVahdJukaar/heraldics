@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.mehvahdjukaar.heraldics.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "HorseArmorLayerMixin"
+  ],
+  "mixins": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "heraldics:block/flagstone_bricks",
+    "top": "heraldics:block/flagstone_bricks",
+    "side": "heraldics:block/flagstone_bricks"
+  }
+}

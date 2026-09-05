@@ -13,11 +13,11 @@
   },
   "license": "${mod_license}",
   "icon": "icon.png",
-  "accessWidener": "feudalist.accesswidener",
+  "accessWidener": "heraldics.accesswidener",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.mehvahdjukaar.feudalist.platform.FeudalistModFabric"
+      "net.mehvahdjukaar.heraldics.platform.HeraldicsModFabric"
     ]
   },
   "mixins": [
