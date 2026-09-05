@@ -43,10 +43,6 @@ public class PortcullisMover {
         return resolve(level, gratePos, dir) != null;
     }
 
-    /**
-     * Moves the grate that contains gratePos. Nothing changes when it returns false.
-     * Run it on both sides, the moving piston block entities it makes are never synced.
-     */
     public static boolean move(Level level, BlockPos gratePos, Direction dir) {
         PortcullisMover mover = resolve(level, gratePos, dir);
         if (mover == null) return false;
@@ -62,9 +58,6 @@ public class PortcullisMover {
         return mover.resolve(grate) ? mover : null;
     }
 
-    /**
-     * Flood fill over every block that sticks to the clicked one. Null if the thing is too big.
-     */
     @Nullable
     private static Set<BlockPos> collectGrate(Level level, BlockPos origin) {
         Set<BlockPos> found = new LinkedHashSet<>();
@@ -118,10 +111,6 @@ public class PortcullisMover {
         return PistonBaseBlock.isPushable(level.getBlockState(pos), level, pos, pushDirection, allowDestroy, pushDirection);
     }
 
-    /**
-     * Same handoff a piston does: every block becomes a moving piston block entity that slides on its own.
-     * States are read up front so the write order doesn't matter.
-     */
     private void moveBlocks() {
         Map<BlockPos, BlockState> moved = new LinkedHashMap<>();
         for (BlockPos pos : toPush) {

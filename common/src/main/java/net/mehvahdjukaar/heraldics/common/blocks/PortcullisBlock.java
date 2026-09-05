@@ -19,10 +19,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-/**
- * Grate panel that pistons drag around as one piece. AXIS is the panel normal, so the four faces
- * that fill a whole block side can stick, and only to another panel lying the same way.
- */
 public class PortcullisBlock extends RotatedPillarBlock implements IDirectionalStickyBlock {
 
     private static final VoxelShape X_SHAPE = Block.box(6, 0, 0, 10, 16, 16);
