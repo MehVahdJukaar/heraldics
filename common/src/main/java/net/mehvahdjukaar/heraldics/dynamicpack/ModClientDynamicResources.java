@@ -43,7 +43,7 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
             * (float) TabardArmorModel.BODY_FACE_SIZE
             / (TabardArmorModel.BODY_FACE_SIZE + TabardArmorModel.FLAP_FACE_SIZE));
 
-    private static final int HORSE_LAYER_SIZE = 64;
+    public static final int HORSE_LAYER_SIZE = 64;
     private static final int PANEL_WIDTH = 7;
     private static final int PANEL_HEIGHT = 14;
     private static final int PANEL_TOP = 22;
@@ -53,6 +53,9 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
     private static final int REAR_RIGHT_PANEL_X = 0;
     private static final int[] PANEL_X =
             {FRONT_LEFT_PANEL_X, FRONT_RIGHT_PANEL_X, REAR_LEFT_PANEL_X, REAR_RIGHT_PANEL_X};
+    //the one panel the whole flag gets squeezed onto. the others are copied off it
+    public static final Rect2D HORSE_FLAG_PANEL =
+            new Rect2D(FRONT_LEFT_PANEL_X, PANEL_TOP, PANEL_WIDTH, PANEL_HEIGHT);
 
     private static final TextureCollager CHAINMAIL_ONTO_TABARD = mapChainmailOntoTabard();
     private static final TextureCollager CLOTH_OVER_CHAINMAIL = layClothOverChainmail();
@@ -122,7 +125,7 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
     private static TextureCollager mapFlagOntoDrape() {
         return TextureCollager.builder(BANNER_TEXTURE_SIZE, BANNER_TEXTURE_SIZE, HORSE_LAYER_SIZE, HORSE_LAYER_SIZE)
                 .copyFrom(FLAG_FACE)
-                .to(FRONT_LEFT_PANEL_X, PANEL_TOP, PANEL_WIDTH, PANEL_HEIGHT).boxScaling()
+                .to(HORSE_FLAG_PANEL).boxScaling()
                 .build();
     }
 

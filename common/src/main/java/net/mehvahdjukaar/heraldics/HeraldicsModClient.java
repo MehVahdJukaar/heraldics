@@ -9,6 +9,7 @@ import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
@@ -29,6 +30,10 @@ public class HeraldicsModClient {
 
     public static void init() {
         RegHelper.registerDynamicResourceProvider(new ModClientDynamicResources());
+        ClientHelper.addClientSetup(() -> {
+            ClientHelper.registerRenderType(HeraldicsMod.WROUGHT_IRON_FENCE.get(), RenderType.cutoutMipped());
+            ClientHelper.registerRenderType(HeraldicsMod.WROUGHT_IRON_RAILING.get(), RenderType.cutoutMipped());
+        });
         ClientHelper.addModelLayerRegistration(e -> {
             e.register(TABARD_ARMOR_LAYER, TabardArmorModel::createLayer);
             e.register(TABARD_HORSE_ARMOR_LAYER, TabardHorseArmorModel::createLayer);
