@@ -1,10 +1,12 @@
 package net.mehvahdjukaar.heraldics.common.items;
 
+import net.mehvahdjukaar.heraldics.HeraldicsMod;
 import net.mehvahdjukaar.heraldics.client.TabardLoomPreview;
 import net.mehvahdjukaar.moonlight.api.client.LoomItemRenderer;
 import net.mehvahdjukaar.moonlight.api.item.ILoomItem;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.AnimalArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class TabardHorseArmorItem extends AnimalArmorItem implements ILoomItem {
+
+    private ResourceLocation LOOM_SLOT = HeraldicsMod.res("item/gui_slots/empty_slot_horse_tabard");
 
     public TabardHorseArmorItem(Holder<ArmorMaterial> material, Properties properties) {
         super(material, BodyType.EQUESTRIAN, false, properties);
@@ -33,7 +37,12 @@ public class TabardHorseArmorItem extends AnimalArmorItem implements ILoomItem {
     }
 
     @Override
+    public ResourceLocation getLoomSlotIcon() {
+        return LOOM_SLOT;
+    }
+
+    @Override
     public Supplier<LoomItemRenderer> getLoomRenderer() {
-        return TabardLoomPreview.HORSE_ARMOR;
+        return ()->TabardLoomPreview.HORSE_ARMOR;
     }
 }
