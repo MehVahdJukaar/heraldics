@@ -1,0 +1,21 @@
+{
+  "block.heraldics.chiseled_portcullis": "Faragott csapórács",
+  "block.heraldics.flagstone_bricks": "Lapkőtégla",
+  "block.heraldics.flagstone_bricks_slab": "Lapkőtégla-lap",
+  "block.heraldics.flagstone_bricks_stairs": "Lapkőtégla-lépcső",
+  "block.heraldics.flagstone_bricks_wall": "Lapkőtéglafal",
+  "block.heraldics.portcullis": "Csapórács",
+  "block.heraldics.sandstone_mosaic": "Homokkőmozaik",
+  "block.heraldics.sandstone_mosaic_slab": "Homokkőmozaik-lap",
+  "block.heraldics.sandstone_mosaic_stairs": "Homokkőmozaik-lépcső",
+  "block.heraldics.sandstone_mosaic_wall": "Homokkőmozaik-fal",
+  "block.heraldics.wrought_iron_fence": "Kovácsoltvas kerítés",
+  "block.heraldics.wrought_iron_railing": "Kovácsoltvas korlát",
+  "heraldics.configuration.portcullis": "Csapórács",
+  "heraldics.configuration.portcullis.always_hand_pushable": "Mindig kézzel tolható",
+  "heraldics.configuration.portcullis.always_hand_pushable.description": "Megengedi, hogy kézzel felhúzhasd és leereszthesd a csapórácsat akkor is, amikor a Supplementaries jelen van. Alaphelyzetben kikapcsolva, így a csörlő marad a mozgatás módja.",
+  "item.heraldics.chainmail_horse_armor": "Lánc lópáncél",
+  "item.heraldics.tabard_chestplate": "Tabárd",
+  "item.heraldics.tabard_horse_armor": "Csótár",
+  "subtitles.heraldics.portcullis.move": "Csapórács mozog"
+}

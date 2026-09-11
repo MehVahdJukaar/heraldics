@@ -1,63 +1,19 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "heraldics:mixed_stones",
   "category": "building",
   "ingredients": [
-    [
-      {
-        "item": "minecraft:andesite"
-      },
-      {
-        "item": "minecraft:granite"
-      },
-      {
-        "item": "minecraft:diorite"
-      },
-      {
-        "item": "minecraft:cobblestone"
-      }
-    ],
-    [
-      {
-        "item": "minecraft:andesite"
-      },
-      {
-        "item": "minecraft:granite"
-      },
-      {
-        "item": "minecraft:diorite"
-      },
-      {
-        "item": "minecraft:cobblestone"
-      }
-    ],
-    [
-      {
-        "item": "minecraft:andesite"
-      },
-      {
-        "item": "minecraft:granite"
-      },
-      {
-        "item": "minecraft:diorite"
-      },
-      {
-        "item": "minecraft:cobblestone"
-      }
-    ],
-    [
-      {
-        "item": "minecraft:andesite"
-      },
-      {
-        "item": "minecraft:granite"
-      },
-      {
-        "item": "minecraft:diorite"
-      },
-      {
-        "item": "minecraft:cobblestone"
-      }
-    ]
+    {
+      "item": "minecraft:andesite"
+    },
+    {
+      "item": "minecraft:granite"
+    },
+    {
+      "item": "minecraft:diorite"
+    },
+    {
+      "item": "minecraft:cobblestone"
+    }
   ],
   "result": {
     "id": "heraldics:flagstone_bricks",

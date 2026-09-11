@@ -18,6 +18,15 @@
   "entrypoints": {
     "main": [
       "net.mehvahdjukaar.heraldics.platform.HeraldicsModFabric"
+    ],
+    "rei_client": [
+      "net.mehvahdjukaar.heraldics.integration.REICompat"
+    ],
+    "jei_mod_plugin": [
+      "net.mehvahdjukaar.heraldics.integration.JEICompat"
+    ],
+    "emi": [
+      "net.mehvahdjukaar.heraldics.integration.EMICompat"
     ]
   },
   "mixins": [

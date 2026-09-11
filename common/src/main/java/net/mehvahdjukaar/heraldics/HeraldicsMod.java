@@ -4,6 +4,7 @@ package net.mehvahdjukaar.heraldics;
 import net.mehvahdjukaar.heraldics.common.blocks.PortcullisBlock;
 import net.mehvahdjukaar.heraldics.common.items.TabardChestplateItem;
 import net.mehvahdjukaar.heraldics.common.items.TabardHorseArmorItem;
+import net.mehvahdjukaar.heraldics.common.items.crafting.MixedStonesRecipe;
 import net.mehvahdjukaar.heraldics.common.items.crafting.TabardFromBannerRecipe;
 import net.mehvahdjukaar.heraldics.common.misc.LootInjects;
 import net.mehvahdjukaar.heraldics.configs.CommonConfigs;
@@ -112,6 +113,9 @@ public class HeraldicsMod {
 
     public static final Supplier<RecipeSerializer<TabardFromBannerRecipe>> TABARD_FROM_BANNER =
             RegHelper.registerSpecialRecipe(res("tabard_from_banner"), TabardFromBannerRecipe::new);
+
+    public static final Supplier<RecipeSerializer<MixedStonesRecipe>> MIXED_STONES =
+            RegHelper.registerRecipeSerializer(res("mixed_stones"), MixedStonesRecipe.Serializer::new);
 
 
     public static final RegSupplier<CreativeModeTab> TAB = RegHelper.registerCreativeModeTab(
