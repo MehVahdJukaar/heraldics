@@ -33,8 +33,7 @@ public class TabardLoomPreview implements LoomItemRenderer {
     private static final int ICON_WIDTH = 5;
     private static final int ICON_HEIGHT = 10;
 
-    private static final int CHEST_ROWS = FLAG_HEIGHT * TabardArmorModel.BODY_FACE_SIZE
-            / (TabardArmorModel.BODY_FACE_SIZE + TabardArmorModel.FLAP_FACE_SIZE);
+    private static final int CHEST_ROWS = FLAG_HEIGHT * TabardArmorModel.BODY_FACE_SIZE/(TabardArmorModel.BODY_FACE_SIZE + TabardArmorModel.FLAP_FACE_SIZE);
 
     public static final LoomItemRenderer CHESTPLATE = new TabardLoomPreview(
             TabardArmorRenderer.LAYER_TEXTURES, TabardArmorModel.TEXTURE_SIZE,
@@ -59,10 +58,6 @@ public class TabardLoomPreview implements LoomItemRenderer {
         this.layerTexture = layerTexture;
         this.sheetSize = sheetSize;
         this.panels = panels;
-    }
-
-    private static Supplier<LoomItemRenderer> fixed(TabardLoomPreview renderer) {
-        return () -> renderer;
     }
 
     @Override
@@ -90,8 +85,7 @@ public class TabardLoomPreview implements LoomItemRenderer {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         drawLayer(graphics, BASE_PATTERN, DyeColor.GRAY, x + ICON_X, y + ICON_Y, ICON_WIDTH, ICON_HEIGHT);
-        drawLayer(graphics, pattern.value().assetId(), DyeColor.WHITE,
-                x + ICON_X, y + ICON_Y, ICON_WIDTH, ICON_HEIGHT);
+        drawLayer(graphics, pattern.value().assetId(), DyeColor.WHITE, x + ICON_X, y + ICON_Y, ICON_WIDTH, ICON_HEIGHT);
         graphics.setColor(1, 1, 1, 1);
         RenderSystem.disableBlend();
         return true;

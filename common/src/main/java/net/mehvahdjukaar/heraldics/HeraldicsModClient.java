@@ -42,6 +42,7 @@ public class HeraldicsModClient {
         //the baked parts die with the model set, so throw ours away on reload and bake them again on demand
         ClientHelper.addClientReloadListener(
                 () -> (ResourceManagerReloadListener) manager -> {
+                    //invalidate as might have changed
                     tabardArmorModel = null;
                     tabardHorseArmorModel = null;
                     tabardHorseMailModel = null;

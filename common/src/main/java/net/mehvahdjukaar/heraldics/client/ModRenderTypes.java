@@ -10,8 +10,6 @@ import java.util.function.Function;
 
 public class ModRenderTypes extends RenderType {
 
-    //entity_no_outline with the same view offset the armor render types use. armor sits a hair closer to the
-    //camera than the entity, so anything layered over it has to move by the same amount or it z-fights
     public static final Function<ResourceLocation, RenderType> ARMOR_PATTERN_LAYER = Util.memoize(texture -> {
         CompositeState state = CompositeState.builder()
                 .setShaderState(RENDERTYPE_ENTITY_NO_OUTLINE_SHADER)

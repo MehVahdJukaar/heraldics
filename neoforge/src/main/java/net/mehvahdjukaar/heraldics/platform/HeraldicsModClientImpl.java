@@ -13,7 +13,6 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 public class HeraldicsModClientImpl {
 
     public static void registerArmorRenderers() {
-        //called while our mod is being constructed, so this is our own bus
         ModLoadingContext.get().getActiveContainer().getEventBus()
                 .addListener(HeraldicsModClientImpl::onRegisterClientExtensions);
     }

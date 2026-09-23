@@ -11,6 +11,7 @@ public class LootInjects {
 
     private static final ResourceLocation CHAINMAIL_HORSE_ARMOR_POOL = HeraldicsMod.res("inject/chainmail_horse_armor");
 
+    //TODO: add chests from mod support
     private static final Set<ResourceLocation> CHAINMAIL_HORSE_ARMOR_TABLES = Set.of(
             BuiltInLootTables.VILLAGE_WEAPONSMITH.location(),
             BuiltInLootTables.PILLAGER_OUTPOST.location(),

@@ -15,13 +15,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * Appends the banner passes after the base layer, which is already drawn by then on the model our client
- * item extension handed over.
- * Going through ArmorMaterial layers and getArmorLayerTintColor instead would mean declaring all 17
- * possible layers up front, and vanilla draws each of them cutout off a plain texture, so the atlas
- * batching and the soft pattern edges would both be gone.
- */
+//a bit hacky tbh but gives better compat
+//TODO: verify if neoforge event could still be used
 @Mixin(HumanoidArmorLayer.class)
 public class HumanoidArmorLayerMixin {
 

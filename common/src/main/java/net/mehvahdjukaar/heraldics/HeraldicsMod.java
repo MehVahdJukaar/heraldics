@@ -162,7 +162,7 @@ public class HeraldicsMod {
         CommonConfigs.init();
         LootInjects.init();
         RegHelper.addItemsToTabsRegistration(itemToTabEvent -> {
-            itemToTabEvent.add((ResourceKey<CreativeModeTab>) TAB.getKey(),
+            itemToTabEvent.add(TAB.getKey(),
                     TAB_CONTENT.stream()
                             .map(Supplier::get)
                             .toArray(ItemLike[]::new));

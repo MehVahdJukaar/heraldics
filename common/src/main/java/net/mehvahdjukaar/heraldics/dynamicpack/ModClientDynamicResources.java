@@ -53,7 +53,6 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
     private static final int REAR_RIGHT_PANEL_X = 0;
     private static final int[] PANEL_X =
             {FRONT_LEFT_PANEL_X, FRONT_RIGHT_PANEL_X, REAR_LEFT_PANEL_X, REAR_RIGHT_PANEL_X};
-    //the one panel the whole flag gets squeezed onto. the others are copied off it
     public static final Rect2D HORSE_FLAG_PANEL =
             new Rect2D(FRONT_LEFT_PANEL_X, PANEL_TOP, PANEL_WIDTH, PANEL_HEIGHT);
 
@@ -254,6 +253,7 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
         }
     }
 
+    //nonsense code
     private static void spreadPanelsOverRestOfCloth(TextureImage layer, TextureImage cloth) {
         int size = layer.imageWidth();
         int scale = Math.max(1, size / HORSE_LAYER_SIZE);
@@ -261,7 +261,7 @@ public class ModClientDynamicResources extends DynamicClientResourceProvider {
         int top = PANEL_TOP * scale;
         int bottom = top + PANEL_HEIGHT * scale - 1;
         for (int y = 0; y < size; y++) {
-            int clampedY = Math.min(Math.max(y, top), bottom);
+            int clampedY = Math.clamp(y, top, bottom);
             int dy = Math.abs(y - clampedY);
             for (int x = 0; x < size; x++) {
                 if (!isSolid(sampleCloth(cloth, x, y, size))) continue;

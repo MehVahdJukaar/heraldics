@@ -21,6 +21,7 @@ public class TabardArmorModel extends HumanoidModel<LivingEntity> {
 
     public static final int TEXTURE_SIZE = 64;
 
+    //These are here only so we have a shared place to reference these dimensions sicne texture gen needs them
     private static final int DEFORMATION = 1;
     private static final CubeDeformation CHESTPLATE_DEFORMATION = new CubeDeformation(DEFORMATION);
     private static final int BODY_HEIGHT = 8;

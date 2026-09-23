@@ -13,7 +13,9 @@ public class SpecialRecipeDisplays {
     public static List<RecipeHolder<CraftingRecipe>> createMixedStonesDisplays(RecipeManager manager) {
         List<RecipeHolder<CraftingRecipe>> displays = new ArrayList<>();
         for (RecipeHolder<CraftingRecipe> holder : manager.getAllRecipesFor(RecipeType.CRAFTING)) {
-            if (!(holder.value() instanceof MixedStonesRecipe recipe)) continue;
+            if (!(holder.value() instanceof MixedStonesRecipe recipe)){
+                continue;
+            }
 
             List<Ingredient> stones = recipe.getStones();
             int count = stones.size();
